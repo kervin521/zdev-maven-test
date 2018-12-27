@@ -1,0 +1,495 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.dev</groupId>
+	<artifactId>zdev-maven-test</artifactId>
+	<version>1.0</version>
+	<name>zdev-maven-test</name>
+	<description>zdev-maven-test</description>
+	<properties>
+		<java.version>1.8</java.version>
+		<java.encoding>UTF-8</java.encoding>
+		<maven.test.skip>true</maven.test.skip>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<spring.version>3.2.14.RELEASE</spring.version>
+		<!-- <spring-boot.version>2.1.1.RELEASE</spring-boot.version> -->
+		<spring-boot.version>1.5.18.RELEASE</spring-boot.version>
+		<!-- <spring-cloud.version>Finchley.SR2</spring-cloud.version> -->
+		<spring-cloud.version>Edgware.SR5</spring-cloud.version>
+		<spring-cloud-netflix.version>1.4.6.RELEASE</spring-cloud-netflix.version>
+		<!-- <spring-cloud-netflix.version>2.0.2.RELEASE</spring-cloud-netflix.version> -->
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- (依赖管理：继承一些默认的依赖，工程需要依赖的jar包的管理，申明其他dependency的时候就不需要version) -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+	            <groupId>org.springframework.cloud</groupId>
+	            <artifactId>spring-cloud-dependencies</artifactId>
+	            <version>${spring-cloud.version}</version>
+	            <type>pom</type>
+	            <scope>import</scope>
+	        </dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-netflix</artifactId>
+				<version>${spring-cloud-netflix.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<dependencies>
+		<dependency>
+		    <groupId>io.dropwizard.metrics</groupId>
+		    <artifactId>metrics-jvm</artifactId>
+		    <version>3.2.6</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.springframework.kafka</groupId>
+		    <artifactId>spring-kafka</artifactId>
+		    <version>1.3.8.RELEASE</version>
+		    <!-- <version>2.2.2.RELEASE</version> -->
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-redis</artifactId>
+		    <version>1.8.17.RELEASE</version>
+		</dependency>
+		<dependency>
+		    <groupId>redis.clients</groupId>
+		    <artifactId>jedis</artifactId>
+		    <version>2.8.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.alibaba.otter</groupId>
+			<artifactId>canal.client</artifactId>
+		    <version>1.1.2</version>
+	    </dependency>
+		<dependency>
+		    <groupId>com.alibaba.otter</groupId>
+			<artifactId>canal.server</artifactId>
+		    <version>1.1.2</version>
+	    </dependency>
+		<!-- Spring 3.2.14 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.8.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.3.11.Final</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>4.2.20.Final</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.ibm.db2.jcc</groupId>
+		    <artifactId>db2jcc</artifactId>
+		    <version>db2jcc4</version>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>ojdbc</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>14</version>
+		</dependency> -->
+		
+		<dependency>
+			<groupId>com.hynnet</groupId>
+			<artifactId>sqljdbc-chs</artifactId>
+			<version>4.0.2206.100</version>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>1.2.3</version>
+			<!-- <version>1.3.0-SNAPSHOT</version> -->
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.3.0</version>
+			<!-- <version>3.4.0-SNAPSHOT</version> -->
+		</dependency>
+		
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.47</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
+			<type>jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+		    <version>1.1.11</version>
+        </dependency>
+        <dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.54</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.10</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.13-beta1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>org.safehaus.jug</groupId>
+			<artifactId>jug</artifactId>
+			<version>2.0.0</version>
+		</dependency> -->
+		
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>3.1.4</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp.jstl</groupId>
+			<artifactId>javax.servlet.jsp.jstl-api</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.xfire</groupId>
+			<artifactId>xfire-all</artifactId>
+			<version>1.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>jmock</groupId>
+			<artifactId>jmock</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		
+		<!-- <dependency>
+			<groupId>com.cloudhopper.proxool</groupId>
+			<artifactId>proxool</artifactId>
+			<version>0.9.1</version>
+		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<version>2.19</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${java.encoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<encoding>${java.encoding}</encoding>
+				</configuration>
+			</plugin>
+			<!-- SVN版本号 -->
+			<plugin>  
+		        <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>  
+		        <artifactId>maven-svn-revision-number-plugin</artifactId>  
+		        <version>1.7</version>  
+				<executions>  
+				    <execution>
+				    	<id>make-svn-number</id>
+		                <phase>package</phase>  
+				        <goals>
+				            <goal>revision</goal>  
+				        </goals>  
+				    </execution>  
+				</executions>  
+				<configuration>  
+				    <entries>  
+				        <entry>  
+				            <prefix>svn</prefix>  
+				        </entry>  
+				    </entries>  
+				</configuration>  
+		    </plugin>
+		    <!-- 源码包 -->
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-source-plugin</artifactId>
+			    <version>2.4</version>
+			    <configuration>
+			    	<finalName>${project.artifactId}-${project.version}</finalName>
+			    </configuration>
+			    <executions>
+			      <execution>
+			        <id>attach-sources</id>
+			        <phase>package</phase>
+			        <goals>
+			        	<goal>jar-no-fork</goal>
+			        </goals>
+			      </execution>
+			    </executions>
+			</plugin>
+			<!-- Javadoc包 -->
+			<plugin>          
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-javadoc-plugin</artifactId>
+			    <version>2.10.3</version>
+			    <configuration>
+			    	<finalName>${project.artifactId}-${project.version}</finalName>
+			    </configuration>
+			    <executions>
+			      <execution>
+		        	  <id>attach-javadocs</id>
+		        	  <phase>package</phase>
+			          <goals>
+			            <goal>jar</goal>
+			          </goals>
+			      </execution>
+			    </executions>
+			</plugin> 
+			<!-- war全包打包 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<warName>${project.artifactId}</warName>
+					<outputDirectory>${project.basedir}/target/${project.packaging}-${project.version}</outputDirectory>
+					<packagingExcludes>WEB-INF/web.xml</packagingExcludes>
+					<warSourceExcludes>**/.svn/**,**/.idea/**</warSourceExcludes>
+				</configuration>
+			</plugin>
+			<!-- 增量包打包 -->
+		  	<plugin>
+	          	<groupId>org.apache.maven.plugins</groupId>
+	          	<artifactId>maven-assembly-plugin</artifactId>
+	          	<version>2.5.1</version>
+	          	<configuration>
+	          		<finalName>${project.artifactId}-${project.version}.${maven.build.timestamp}</finalName>
+		            <descriptors>
+		                 <descriptor>assembly-zip.xml</descriptor>
+		            </descriptors>
+		            <!-- 打包命名是否包含assemblyId -->
+		            <appendAssemblyId>true</appendAssemblyId>
+	          	</configuration>
+	          	<executions>
+		              <execution>
+		                  <id>make-assembly</id>
+		                  <phase>package</phase>
+		                  <goals>
+		                      <goal>single</goal>
+		                  </goals>
+		              </execution>
+	          	</executions>
+	        </plugin>
+	        
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.4</version>
+				<configuration>
+					<locales>zh_CN</locales>
+					<outputEncoding>${java.encoding}</outputEncoding>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>2.8</version>
+							<reports>
+								<report>summary</report>
+							</reports>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-surefire-report-plugin</artifactId>
+							<version>2.18.1</version>
+						</plugin>
+						<!-- findbugs插件 -->
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>findbugs-maven-plugin</artifactId>
+							<version>3.0.1</version>
+							<configuration>
+								<findbugsXmlOutput>true</findbugsXmlOutput>
+								<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+								<xmlOutput>true</xmlOutput>
+								<findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-checkstyle-plugin</artifactId>
+							<version>2.16</version>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-jxr-plugin</artifactId>
+							<version>2.5</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-scm-plugin</artifactId>
+		        <version>1.9.4</version>
+		        <configuration>
+		          <connectionType>connection</connectionType>
+		        </configuration>
+	        </plugin>
+	        <!-- CLI包(即可执行jar包)-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<finalName>SystemTime</finalName>
+					<outputDirectory>${project.basedir}/target/${project.packaging}-${project.version}</outputDirectory>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+						  <mainClass>com.wafersystems.SystemTime</mainClass>
+						</transformer>
+					</transformers>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+						  <goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<!-- <repository>
+	    <connection>scm:cvs:pserver:anonymous@domingo.cvs.sourceforge.net:/cvsroot/domingo:domingo</connection>
+	    <developerConnection>scm:cvs:ext:developername@domingo.cvs.sourceforge.net:/cvsroot/domingo:domingo</developerConnection>
+	    <url>http://domingo.cvs.sourceforge.net/domingo/domingo/</url>
+	</repository> -->
+</project>

@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd">
+   <!-- <context:property-placeholder location="classpath:kafka.properties" ignore-unresolvable="true"/> -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:kafka.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+	</bean>
+   
+   <bean id="kconfig" class="com.kafka.spring.service.CommonKafkaConfig">
+   		<property name="topic" value="${kafka.topic}"/>
+   		<property name="autoCommit" value="${enable.auto.commit}"/>
+   </bean>
+    <!-- 生产端工厂类 -->
+    <bean id="producerFactory" class="org.springframework.kafka.core.DefaultKafkaProducerFactory">
+        <constructor-arg name="configs">
+        	<map>
+                <entry key="bootstrap.servers" value="${bootstrap.servers}" />
+                <entry key="acks" value="${acks}" />
+                <entry key="retries" value="${retries}" />
+                <entry key="batch.size" value="${batch.size}" />
+                <entry key="linger.ms" value="${linger.ms}" />
+                <entry key="buffer.memory" value="${buffer.memory}" />
+                <entry key="max.block.ms" value="${max.block.ms}" />
+                <entry key="request.timeout.ms" value="${request.timeout.ms}" />
+                <entry key="key.serializer" value="org.apache.kafka.common.serialization.StringSerializer" />
+                <entry key="value.serializer" value="org.apache.kafka.common.serialization.StringSerializer" />
+            </map>
+        </constructor-arg>
+    </bean>
+	
+	<!-- 生产端回调类 -->
+	<bean id="kafkaProducerListener" class="com.kafka.spring.KafkaProducerService" autowire-candidate="false"/>
+	<bean id="producerListener" factory-bean="kafkaProducerListener" factory-method="callback"/>
+    
+    <!-- 创建kafkatemplate bean，使用的时候，只需要注入这个bean，即可使用template的send消息方法 -->
+    <bean id="kafkaTemplate" class="org.springframework.kafka.core.KafkaTemplate">
+        <constructor-arg ref="producerFactory" />
+        <constructor-arg name="autoFlush" value="${auto.flush}" />
+        <property name="producerListener" ref="producerListener"/>
+    </bean>
+    
+    <bean id="kafkaProducerService" class="com.kafka.spring.KafkaProducerService">
+    	<property name="template" ref="kafkaTemplate"/>
+    </bean>
+
+    <!-- 消费端工厂类 -->
+    <bean id="consumerFactory" class="org.springframework.kafka.core.DefaultKafkaConsumerFactory" >
+        <constructor-arg name="configs">
+            <map>
+                <entry key="bootstrap.servers" value="${bootstrap.servers}" />
+                <entry key="group.id" value="${group.id}" />
+                <entry key="enable.auto.commit" value="${enable.auto.commit}" />
+                <entry key="session.timeout.ms" value="${session.timeout.ms}" />
+                <entry key="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer" />
+                <entry key="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- 定义消费实现类 -->
+    <bean id="kafkaConsumerService" class="com.kafka.spring.KafkaConsumerService"/>
+    
+	<bean id="BATCH" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+		<property name="staticField" value="org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.BATCH"/>
+	</bean>
+	<bean id="MANUAL" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+		<property name="staticField" value="org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL"/>
+	</bean>
+    <!-- 消费者容器配置信息 -->
+    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties">
+        <!-- topic -->
+        <constructor-arg name="topics">
+            <list>
+                <value>#{kconfig.topic}</value>
+            </list>
+        </constructor-arg>
+        <property name="messageListener" ref="kafkaConsumerService" />
+        <property name="ackMode" value="#{${enable.auto.commit}?@BATCH:@MANUAL}"/>
+        <!-- <property name="ackMode" value="#{${enable.auto.commit}?T(org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode).BATCH:T(org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode).MANUAL}"/> -->
+    </bean>
+    <!-- 消费者并发消息监听容器，执行doStart()方法 -->
+    <bean id="messageListenerContainer" class="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" init-method="doStart" >
+        <constructor-arg ref="consumerFactory" />
+        <constructor-arg ref="containerProperties" />
+        <property name="concurrency" value="${concurrency}" />
+    </bean>
+</beans>
