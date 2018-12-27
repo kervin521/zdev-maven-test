@@ -10,7 +10,7 @@
 		<java.encoding>UTF-8</java.encoding>
 		<maven.test.skip>true</maven.test.skip>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
-		<spring.version>3.2.14.RELEASE</spring.version>
+		<spring.version>4.3.21.RELEASE</spring.version>
 		<!-- <spring-boot.version>2.1.1.RELEASE</spring-boot.version> -->
 		<spring-boot.version>1.5.18.RELEASE</spring-boot.version>
 		<!-- <spring-cloud.version>Finchley.SR2</spring-cloud.version> -->
@@ -273,6 +273,12 @@
 			<version>1.0.1</version>
 		</dependency>
 
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		    <version>4.0.1</version>
+		    <scope>provided</scope>
+		</dependency>
 		
 		<!-- <dependency>
 			<groupId>com.cloudhopper.proxool</groupId>

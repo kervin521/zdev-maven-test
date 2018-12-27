@@ -16,7 +16,7 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
    
-   <bean id="kconfig" class="com.kafka.spring.service.CommonKafkaConfig">
+   <bean id="kconfig" class="com.dev.share.kafka.spring.support.CommonKafkaConfig">
    		<property name="topic" value="${kafka.topic}"/>
    		<property name="autoCommit" value="${enable.auto.commit}"/>
    </bean>
@@ -39,7 +39,7 @@
     </bean>
 	
 	<!-- 生产端回调类 -->
-	<bean id="kafkaProducerListener" class="com.kafka.spring.KafkaProducerService" autowire-candidate="false"/>
+	<bean id="kafkaProducerListener" class="com.dev.share.kafka.spring.KafkaProducerService" autowire-candidate="false"/>
 	<bean id="producerListener" factory-bean="kafkaProducerListener" factory-method="callback"/>
     
     <!-- 创建kafkatemplate bean，使用的时候，只需要注入这个bean，即可使用template的send消息方法 -->
@@ -49,7 +49,7 @@
         <property name="producerListener" ref="producerListener"/>
     </bean>
     
-    <bean id="kafkaProducerService" class="com.kafka.spring.KafkaProducerService">
+    <bean id="kafkaProducerService" class="com.dev.share.kafka.spring.KafkaProducerService">
     	<property name="template" ref="kafkaTemplate"/>
     </bean>
 
@@ -68,7 +68,7 @@
     </bean>
 
     <!-- 定义消费实现类 -->
-    <bean id="kafkaConsumerService" class="com.kafka.spring.KafkaConsumerService"/>
+    <bean id="kafkaConsumerService" class="com.dev.share.kafka.spring.KafkaConsumerService"/>
     
 	<bean id="BATCH" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
 		<property name="staticField" value="org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.BATCH"/>

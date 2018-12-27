@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+ 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- spring线程池配置 -->
+	<task:executor id="executor" pool-size="5-500" queue-capacity="500" />
+	<task:scheduler id="scheduler" pool-size="100" />
+	<task:annotation-driven executor="executor" scheduler="scheduler" />
+	<!-- 默认的注解映射的支持 -->
+	<!-- <mvc:annotation-driven /> -->
+	<!--对js/css/file自动过滤出来 -->
+	<!-- <mvc:default-servlet-handler /> -->
+	<!-- <mvc:resources mapping="/resources/**" location="/resources/" /> -->
+	<!-- 启动包扫描功能，以便注册带有@Controller、@Service、@repository、@Component等注解的类成为spring的bean -->
+	<context:component-scan base-package="com.dev.share" />
+
+	<!-- 定义国际化消息 -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+		<property name="useCodeAsDefaultMessage" value="true" />
+	</bean>
+	<!-- 国际化切换配置(ID必须) -->
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
+
+	<!-- (请求|响应)策略配置 -->
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="ignoreAcceptHeader" value="false" />
+		<property name="defaultContentType" value="application/json" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+				<entry key="html" value="text/html" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 视图解释类 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
+		<property name="viewResolvers">
+			<list>
+				<bean
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="prefix" value="/page/" />
+					<property name="suffix" value=".jsp" />
+					<property name="viewClass"
+						value="org.springframework.web.servlet.view.JstlView" />
+				</bean>
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean class="com.alibaba.fastjson.support.spring.FastJsonJsonView">
+					<property name="charset" value="UTF-8" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 注册映射接口URL(启动映射) -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		<property name="interceptors">
+			<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+		</property>
+		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
+	</bean>
+	<!-- 请求接口适配器(请求时适配) -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4">
+					<property name="fastJsonConfig">
+						<bean class="com.alibaba.fastjson.support.config.FastJsonConfig">
+							<property name="charset" value="UTF-8" />
+							<property name="serializerFeatures">
+								<list>
+									<value>WriteMapNullValue</value>
+									<value>WriteNullListAsEmpty</value>
+									<value>WriteNullStringAsEmpty</value>
+									<value>WriteNullNumberAsZero</value>
+									<value>WriteNullBooleanAsFalse</value>
+									<value>DisableCircularReferenceDetect</value>
+									<value>BrowserCompatible</value>
+									<!-- <value>UseISO8601DateFormat</value> -->
+								</list>
+							</property>
+						</bean>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 总错误处理 -->
+	<bean id="exceptionResolver"
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView">
+			<value>error</value>
+		</property>
+		<property name="defaultStatusCode">
+			<value>500</value>
+		</property>
+		<property name="warnLogCategory">
+			<value>org.springframework.web.servlet.handler.SimpleMappingExceptionResolver
+			</value>
+		</property>
+		<property name="exceptionMappings">
+			<props>
+				<!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/jsp/error_fileupload.jsp页面 -->
+				<prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">/basic/user/add</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!--指定所上传文件的总大小不能超过2GB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+		<property name="maxUploadSize" value="-1" />
+	</bean>
+</beans>
