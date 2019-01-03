@@ -29,8 +29,10 @@ public class CipherUtils {//decrypt encrypt
 	public static String RSA_PRIVATE_KEY = "30820153020100300d06092a864886f70d01010105000482013d3082013902010002410092a7cd67e2323922e6cd79c57fd211f8683a130cf1e602d2a96596d5ad6046e1b6a9802f5a9e74b10dac0a2237376bd4bb101e511a054d1d0625b034ecf7f47f02030100010240117c5c6b5476f4850acbd90709547cbc0781552027ff6ababf63d3762ab3ddff814b540b403377b0f5f28c01bce25dbfa0c4608946b5c4be46e8a99f18c140e1022100cb71a641a531771d24a7a0362f4d620900683c6d26a994de3adf3b469b3c6bf7022100b88a9042e190a388d93e02a5d37df82b92afb3d6bd552f6e4f56f387b27fc9b9022078e6d259e2b511c784f805130e6b5b5e641a8e0683da75b8d79dc01946b9d2a302206ed29fb1da7e1f0766d70b86044d6904d9d17461a85008ece8eea1cf430de4d902204c7c10492de5dc7428fdef6fd746ccb8ddbcc5a9e2aa3f71682e08214944a6bd";
 	public static String ECC_PUBLIC_KEY = "3059301306072a8648ce3d020106082a8648ce3d03010703420004111edebedfbffaa0528dda7f0d905896f5fae7e9a6f4b8c1f001d4e6fa63e6dbff68684b358ff886dc4ceefc13281da1944ba682a7eec4a98ec8af69dfc2004d";
 	public static String ECC_PRIVATE_KEY = "3041020100301306072a8648ce3d020106082a8648ce3d030107042730250201010420865e760c64adc53d37c90706ecb968721e5a72f50686e7a06fcb1305e6a44fe6";
-	public static String HMAC_KEY = "c0fee8bbba08ac6d6ae210529484f24c2d50da66ba4d3986924533c6fcf8e35c7e8cabd50dfae8da6a9e70606e397954962e2f6f7cc57e786b447d16206fcbd2";
-	public static String AES_KEY = "kjcx";
+//	public static String HMAC_KEY = "c0fee8bbba08ac6d6ae210529484f24c2d50da66ba4d3986924533c6fcf8e35c7e8cabd50dfae8da6a9e70606e397954962e2f6f7cc57e786b447d16206fcbd2";
+//	public static String AES_KEY = "kjcx";
+	public static String HMAC_KEY = "6b6a6378";
+	public static String AES_KEY = "6b6a6378";
 	static {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
@@ -215,9 +217,10 @@ public class CipherUtils {//decrypt encrypt
 	 * @throws Exception
 	 */
 	public static String encryptAES(String target) throws Exception {
+		byte[] pk = Hex.decodeHex(AES_KEY.toCharArray());
 		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 		SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-		secureRandom.setSeed(AES_KEY.getBytes("UTF-8"));
+		secureRandom.setSeed(pk);
 		keyGenerator.init(128, secureRandom);
 		SecretKey secretKey = keyGenerator.generateKey();
 		byte[] enCodeFormat = secretKey.getEncoded();
@@ -239,9 +242,10 @@ public class CipherUtils {//decrypt encrypt
 	 * @return
 	 */
 	public static String decryptAES(String target) throws Exception {
+		byte[] pk = Hex.decodeHex(AES_KEY.toCharArray());
 		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 		SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-		secureRandom.setSeed(AES_KEY.getBytes("UTF-8"));
+		secureRandom.setSeed(pk);
 		keyGenerator.init(128, secureRandom);
 		SecretKey secretKey = keyGenerator.generateKey();
 		byte[] enCodeFormat = secretKey.getEncoded();

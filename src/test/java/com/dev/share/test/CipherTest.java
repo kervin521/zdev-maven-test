@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.binary.Hex;
+
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Meter;
 import com.dev.share.ThreadPool.ScheduleRunnable;
@@ -16,7 +18,11 @@ import com.dev.share.util.StringUtils;
 public class CipherTest {
 	public static int core = Runtime.getRuntime().availableProcessors();
 	public static ExecutorService shedule = Executors.newScheduledThreadPool(core*2);
-	public static Meter metric = MetricsHandler.meter("hmac");
+//	public static Meter HMAC = MetricsHandler.meter("HMAC");
+	public static Meter AES = MetricsHandler.meter("AES");
+//	public static Meter RSA = MetricsHandler.meter("RSA");
+//	public static Meter ECC = MetricsHandler.meter("ECC");
+//	public static Meter MD5 = MetricsHandler.meter("MD5");
 	public static void mutiPool(int size) {
 		ConsoleReporter console = MetricsHandler.console();
 		console.start(1, TimeUnit.MILLISECONDS);
@@ -31,14 +37,19 @@ public class CipherTest {
 						String result = null;
 						try {
 //							result = CipherUtils.md5(target);
-							result = CipherUtils.hmac(target);
-//							result = CipherUtils.encryptAES(target);
+//							MD5.mark();
+//							result = CipherUtils.hmac(target);
+//							HMAC.mark();
+							result = CipherUtils.encryptAES(target);
+							AES.mark();
 //							result = CipherUtils.encryptRSA(target);
+//							RSA.mark();
 //							result = CipherUtils.encryptECC(target);
+//							ECC.mark();
 						} catch (Exception e) {
 							e.printStackTrace();// 异常信息
 						}
-						metric.mark();
+						
 						long deply = System.currentTimeMillis();
 						long diff = Double.valueOf((deply-time)/1000).longValue();
 						if(diff%10==0) {
@@ -106,6 +117,10 @@ public class CipherTest {
 	}
 	public static void main(String[] args) throws Exception {
 		int size = 100;
+		String hex = Hex.encodeHexString("kjcx".getBytes());
+		String hash = new String(Hex.decodeHex(hex.toCharArray()));
+		System.out.println("-----hex:"+hex);
+		System.out.println("-----hash:"+hash);
 //		testRSA(size);
 //		testRSA2(size);
 //		testECC(size);

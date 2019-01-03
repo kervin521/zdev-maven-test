@@ -58,6 +58,11 @@
 		    <version>portable-1.7.1</version>
 		</dependency>
 		<dependency>
+           <groupId>net.sf.cache4j</groupId>
+           <artifactId>cache4j</artifactId>
+           <version>0.4</version>
+       </dependency>
+		<dependency>
 		    <groupId>io.dropwizard.metrics</groupId>
 		    <artifactId>metrics-jvm</artifactId>
 		    <version>3.2.6</version>
