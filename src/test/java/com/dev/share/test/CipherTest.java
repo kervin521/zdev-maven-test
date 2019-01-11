@@ -10,7 +10,7 @@ import org.apache.commons.codec.binary.Hex;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Meter;
-import com.dev.share.ThreadPool.ScheduleRunnable;
+import com.dev.share.ThreadPool.AbstractRunnable;
 import com.dev.share.metrics.MetricsHandler;
 import com.dev.share.util.CipherUtils;
 import com.dev.share.util.StringUtils;
@@ -27,7 +27,7 @@ public class CipherTest {
 		ConsoleReporter console = MetricsHandler.console();
 		console.start(1, TimeUnit.MILLISECONDS);
 		for(int i=0;i<size;i++) {
-			shedule.execute(new ScheduleRunnable(i) {
+			shedule.execute(new AbstractRunnable(i) {
 				@Override
 				public void run() {
 					long time = System.currentTimeMillis();
@@ -125,8 +125,8 @@ public class CipherTest {
 //		testRSA2(size);
 //		testECC(size);
 //		testAES(size);
-//		testMD5(size);
-//		testHMAC(size);
-		mutiPool(size);
+		testMD5(size);
+		testHMAC(size);
+//		mutiPool(size);
 	}
 }

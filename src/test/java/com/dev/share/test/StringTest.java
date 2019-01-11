@@ -1,5 +1,8 @@
 package com.dev.share.test;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import com.dev.share.util.StringUtils;
 
 public class StringTest {
@@ -30,6 +33,14 @@ public class StringTest {
 //		System.out.println(time(start.getTime(), end.getTime()));
 //		test();
 //		StringUtils.join(array, separator)
+		String[] ret = {"1","3","2","6"};
+		System.out.println("------"+StringUtils.join(ret));
+		Arrays.sort(ret, new Comparator<String>() {
+			public int compare(String arg0, String arg1) {
+				return arg0.compareTo(arg1);
+			}
+		});
+		System.out.println("------"+StringUtils.join(ret));
 	}
 
 }
