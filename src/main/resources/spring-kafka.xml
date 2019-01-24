@@ -13,11 +13,9 @@
 				<value>classpath:kafka.properties</value>
 			</list>
 		</property>
-		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
-   
-   <bean id="kconfig" class="com.dev.share.kafka.spring.support.CommonKafkaConfig">
-   		<property name="topic" value="${kafka.topic}"/>
+   <bean id="kconfig" class="com.dev.share.kafka.spring.support.CommonKafkaConfig" autowire-candidate="false">
+   		<property name="topic" value="${kafka.topic}_${channelId:x}"/>
    		<property name="autoCommit" value="${enable.auto.commit}"/>
    </bean>
     <!-- 生产端工厂类 -->
@@ -58,7 +56,7 @@
         <constructor-arg name="configs">
             <map>
                 <entry key="bootstrap.servers" value="${bootstrap.servers}" />
-                <entry key="group.id" value="${group.id}" />
+                <entry key="group.id" value="${group.id}_#{kconfig.randomId}" />
                 <entry key="enable.auto.commit" value="${enable.auto.commit}" />
                 <entry key="session.timeout.ms" value="${session.timeout.ms}" />
                 <entry key="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer" />
@@ -77,7 +75,7 @@
 		<property name="staticField" value="org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL"/>
 	</bean>
     <!-- 消费者容器配置信息 -->
-    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties">
+    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties" lazy-init="true">
         <!-- topic -->
         <constructor-arg name="topics">
             <list>

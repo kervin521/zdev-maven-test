@@ -1,5 +1,11 @@
 package com.dev.share.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
 public class StringUtils extends org.apache.commons.lang.StringUtils {
 
 	public static String time(long start,long end) {
@@ -34,5 +40,77 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 			time = diff+"ms";
 		}
 		return time;
+	}
+	/**
+	  * 描述: GZip压缩
+	  * 作者: ZhangYi
+	  * 时间: 2019年1月12日 上午9:17:15
+	  * 参数: (参数列表)
+	  * @param target	压缩文本
+	  * @return
+	  */
+	public static byte[] gzip(String target) {
+		byte[] data = null;
+		if(isEmpty(target)) {
+			return data;
+		}
+		ByteArrayOutputStream out = null;
+		GZIPOutputStream gout = null;
+		try {
+			out = new ByteArrayOutputStream();
+			gout = new GZIPOutputStream(out);
+			gout.write(target.getBytes());
+			gout.finish();
+			data = out.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();// 异常信息
+		}finally {
+			try {
+				if(gout!=null)gout.close();
+				if(out!=null)out.close();
+			} catch (IOException e) {
+				e.printStackTrace();// 异常信息
+			}
+		}
+		return data;
+	}
+	/**
+	  * 描述: GZip压缩文本解压
+	  * 作者: ZhangYi
+	  * 时间: 2019年1月12日 上午9:17:15
+	  * 参数: (参数列表)
+	  * @param data	压缩数据
+	  * @return
+	  */
+	public static String unGzip(byte[] data) {
+		String target = null;
+		if(data==null||data.length<=0) {
+			return target;
+		}
+		ByteArrayInputStream in = null;
+		GZIPInputStream gin = null;
+		ByteArrayOutputStream out = null;
+		try {
+			in = new ByteArrayInputStream(data);
+			gin = new GZIPInputStream(in);
+			out = new ByteArrayOutputStream();
+			byte[] buf = new byte[512];
+			int num = -1;
+			while ((num = gin.read(buf, 0, buf.length)) != -1) {
+				out.write(buf, 0, num);
+			}
+			target = new String(out.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();// 异常信息
+		}finally {
+			try {
+				if(out!=null)out.close();
+				if(gin!=null)gin.close();
+				if(in!=null)in.close();
+			} catch (IOException e) {
+				e.printStackTrace();// 异常信息
+			}
+		}
+		return target;
 	}
 }

@@ -25,6 +25,8 @@ public abstract class AbstractKafkaConsumerService<T> extends CommonKafkaConfig 
 			if(!StringUtils.isEmpty(key)) {
 				Class<T> clazz = (Class<T>) Class.forName(obj.key());
 				bean = JSON.parseObject(value, clazz);
+			}else {
+				logger.info("---------------topic:{},key:{},value:{}",topic,key,value);
 			}
 			boolean flag = handle(bean);
 			if(flag&&!KAFKA_AUTO_COMMIT_ENABLED&&ack!=null) {

@@ -9,6 +9,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
+import com.codahale.metrics.Slf4jReporter.LoggingLevel;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 
@@ -18,12 +19,20 @@ public class MetricsHandler {
 	private volatile static Map<String,Counter> counters = new ConcurrentHashMap<String,Counter>();
 	private volatile static Map<String,Histogram> histograms = new ConcurrentHashMap<String,Histogram>();
 	private volatile static Map<String,Timer> timers = new ConcurrentHashMap<String,Timer>();
+	public static MetricRegistry registry() {
+		return registry;
+	}
 	public static ConsoleReporter console(){
 		ConsoleReporter console = ConsoleReporter.forRegistry(registry).build();
 		return console;
 	}
 	public static Slf4jReporter slf4j(){
 		Slf4jReporter slf4j = Slf4jReporter.forRegistry(registry).build();
+		return slf4j;
+	}
+	public static Slf4jReporter slf4j(String level){
+		LoggingLevel mlevel= (level==null||level.trim().length()==0||LoggingLevel.valueOf(level.toUpperCase())==null?LoggingLevel.INFO:LoggingLevel.valueOf(level.toUpperCase()));
+		Slf4jReporter slf4j = Slf4jReporter.forRegistry(registry).withLoggingLevel(mlevel).build();
 		return slf4j;
 	}
 	public static Meter meter(String name){

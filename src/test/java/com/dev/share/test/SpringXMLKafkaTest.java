@@ -1,24 +1,37 @@
 package com.dev.share.test;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Slf4jReporter;
 import com.dev.share.kafka.KafkaRecordInfo;
 import com.dev.share.kafka.spring.KafkaProducerService;
+import com.dev.share.metrics.MetricsHandler;
+
+import ch.qos.logback.classic.Level;
 
 
 public class SpringXMLKafkaTest {
-//	public static ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring-kafka.xml");
+	private static Logger logger = LoggerFactory.getLogger(SpringXMLKafkaTest.class);
+	public static int core = Runtime.getRuntime().availableProcessors();
+	public static ScheduledExecutorService schedule = Executors.newScheduledThreadPool(core*2);
+	public static Meter meter = MetricsHandler.meter("Kafka-Producer");
 	public static FileSystemXmlApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:spring-context.xml");
-	public static ScheduledExecutorService schedule = Executors.newScheduledThreadPool(4);
-	public static void producer() {
+	public static void producer() throws IOException, InterruptedException, ConfigurationException {
 		ctx.registerShutdownHook();
 		ctx.start();
+		Slf4jReporter slf4j = MetricsHandler.slf4j(Level.DEBUG.toString());
+  		slf4j.start(1, TimeUnit.SECONDS);
 		final KafkaProducerService kafkaProducerService = ctx.getBean(KafkaProducerService.class);
 		schedule.scheduleAtFixedRate(new Runnable() {
 			@Override
@@ -28,15 +41,13 @@ public class SpringXMLKafkaTest {
 				obj.setContent(data);
 				obj.setName(""+new Date().getTime()%10);
 				kafkaProducerService.sendMsg(obj);
-				System.out.println("==========================================Send Success=======================================");
+				meter.mark();
+				logger.info("==========================================Send Success=======================================");
 			}
 		}, 1, 10, TimeUnit.SECONDS);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		producer();
-//		DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
-//		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
-//		reader.loadBeanDefinitions("spring/applicationContext-test.xml");
 	}
 }

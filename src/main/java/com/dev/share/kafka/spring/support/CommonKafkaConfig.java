@@ -1,5 +1,7 @@
 package com.dev.share.kafka.spring.support;
 
+import java.util.Random;
+
 public class CommonKafkaConfig {
 	public static String KAFKA_TOPIC = "spring_idc_topic2";
 	public static int KAFKA_CONSUMER_BATCCH_SIZE = 100;
@@ -48,7 +50,11 @@ public class CommonKafkaConfig {
 	public String getTopic() {
 		return KAFKA_TOPIC;
 	}
-	public void setAutoCommit(boolean enabled) {
+	public void setAutoCommit(Boolean enabled) {
 		KAFKA_AUTO_COMMIT_ENABLED = enabled;
+	}
+	public String getRandomId() {
+		String randomId = "group_"+new Random().nextInt(10000);
+		return randomId;
 	}
 }

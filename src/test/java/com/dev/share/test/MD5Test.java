@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Meter;
 import com.dev.share.ThreadPool.AbstractRunnable;
-import com.dev.share.metrics.MD5Digest;
 import com.dev.share.metrics.MetricsHandler;
 import com.dev.share.util.StringUtils;
 

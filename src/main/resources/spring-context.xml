@@ -13,7 +13,8 @@
 	<context:annotation-config />
 	<aop:aspectj-autoproxy />
 	<tx:annotation-driven /> -->
-
+	<!-- <context:property-placeholder location="classpath:kafka.properties"/> -->
+	<bean class="com.dev.share.kafka.spring.SpringContextHolder" lazy-init="false"/>
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
@@ -23,9 +24,8 @@
 	</bean>
 	<import resource="classpath:spring-kafka.xml"/>
 	<bean class="org.springframework.context.support.ClassPathXmlApplicationContext">
-		<constructor-arg name="configLocation" value="#{${kafka.enabled}?'classpath:spring-kafka.xml':'*.xml'}"/>
+		<constructor-arg name="configLocation" value="#{${kafka.enabled}?'classpath:spring-kafka.xml':'classpath:servlet-context.xml'}"/>
 	</bean>
-<!-- 	<import resource="#{${kafka.enabled}?spring-kafka.xml:servlet-context.xml}"/> -->
 	<!-- 目标数据源配置 -->
 <!-- 	<bean id="mainDataSource" class="com.alibaba.druid.pool.xa.DruidXADataSource" destroy-method="close">
 		基本属性 url、user、password
