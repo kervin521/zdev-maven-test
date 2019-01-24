@@ -38,9 +38,9 @@ public class MetricTest {
 		metrics.register("jvm.mem", new MemoryUsageGaugeSet());
 		metrics.register("jvm.gc", new GarbageCollectorMetricSet());
 		metrics.register("jvm.thread", new ThreadStatesGaugeSet());
+		metrics.register("jvm.class.load", new ClassLoadingGaugeSet());
+		metrics.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.MILLISECONDS));
 		metrics.register("jvm.buffer.pool", new BufferPoolMetricSet(org.mockito.Mockito.mock(MBeanServer.class)));
-		metrics.register("jvm.classload", new ClassLoadingGaugeSet());
-		metrics.register("jvm.cache.thread", new CachedThreadStatesGaugeSet(1,TimeUnit.MILLISECONDS));
 	}
 	public static void main(String[] args) {
 		console.start(1, TimeUnit.SECONDS);

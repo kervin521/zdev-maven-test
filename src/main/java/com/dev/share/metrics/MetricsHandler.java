@@ -2,6 +2,7 @@ package com.dev.share.metrics;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Counter;
@@ -10,6 +11,11 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 import com.codahale.metrics.Slf4jReporter.LoggingLevel;
+import com.codahale.metrics.jvm.CachedThreadStatesGaugeSet;
+import com.codahale.metrics.jvm.ClassLoadingGaugeSet;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 
@@ -21,6 +27,13 @@ public class MetricsHandler {
 	private volatile static Map<String,Timer> timers = new ConcurrentHashMap<String,Timer>();
 	public static MetricRegistry registry() {
 		return registry;
+	}
+	public static void jvm() {
+		registry.register("jvm.mem", new MemoryUsageGaugeSet());
+		registry.register("jvm.gc", new GarbageCollectorMetricSet());
+		registry.register("jvm.thread", new ThreadStatesGaugeSet());
+		registry.register("jvm.class.load", new ClassLoadingGaugeSet());
+		registry.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.SECONDS));
 	}
 	public static ConsoleReporter console(){
 		ConsoleReporter console = ConsoleReporter.forRegistry(registry).build();
