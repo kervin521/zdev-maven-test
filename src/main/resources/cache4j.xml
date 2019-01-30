@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:redisson="http://redisson.org/schema/redisson"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://redisson.org/schema/redisson
+       http://redisson.org/schema/redisson/redisson.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+       <context:property-placeholder location="classpath:cache4j.properties"/>
+       
+       
+       
+       
+       <!--以下定义cache配置-->
+    <bean id="appProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${appProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${appProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${appProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${appProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="appReportProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${appReportProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${appReportProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${appReportProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${appReportProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+
+    <bean id="appSignProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${appSignProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${appSignProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${appSignProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${appSignProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="apiUniqueProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${apiUniqueProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${apiUniqueProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${apiUniqueProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${apiUniqueProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="mtBatchProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${mtBatchProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${mtBatchProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${mtBatchProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${mtBatchProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="mtContentCheckProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${mtContentCheckProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${mtContentCheckProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${mtContentCheckProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${mtContentCheckProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="mtRouteResultProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${mtRouteResultProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${mtRouteResultProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${mtRouteResultProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${mtRouteResultProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="mtAutoPassProcessInnerCacheConfig" class="com.dev.share.cache4j.RCacheConfig">
+        <constructor-arg name="cacheName" value="${mtAutoPassProcessInnerCache_Name}"/>
+        <constructor-arg name="cacheLock" value="${mtAutoPassProcessInnerCache_Lock}"/>
+        <constructor-arg name="ttl" value="${mtAutoPassProcessInnerCache_ttl}"/>
+        <constructor-arg name="maxIdleTime" value="${mtAutoPassProcessInnerCache_maxIdleTime}"/>
+    </bean>
+
+
+    <bean id="distributedCache" class="com.dev.share.cache4j.DistributedCache" scope="singleton">
+        <property name="cacheConfigs" ref="cacheConfigs"/>
+    </bean>
+
+
+    <util:map id="cacheConfigs" key-type="java.lang.String" value-type="com.dev.share.cache4j.RCacheConfig">
+        <entry key="appProcessInnerCache" value-ref="appProcessInnerCacheConfig"/>
+        <entry key="appReportProcessInnerCache" value-ref="appReportProcessInnerCacheConfig"/>
+        <entry key="appSignProcessInnerCache" value-ref="appSignProcessInnerCacheConfig"/>
+        <entry key="apiUniqueProcessInnerCache" value-ref="apiUniqueProcessInnerCacheConfig"/>
+        <entry key="mtBatchProcessInnerCache" value-ref="mtBatchProcessInnerCacheConfig"/>
+        <entry key="mtContentCheckProcessInnerCache" value-ref="mtContentCheckProcessInnerCacheConfig"/>
+        <entry key="mtRouteResultProcessInnerCache" value-ref="mtRouteResultProcessInnerCacheConfig"/>
+        <entry key="mtAutoPassProcessInnerCache" value-ref="mtAutoPassProcessInnerCacheConfig"/>
+    </util:map>
+</beans>

@@ -13,8 +13,8 @@
 	<context:annotation-config />
 	<aop:aspectj-autoproxy />
 	<tx:annotation-driven /> -->
-	<!-- <context:property-placeholder location="classpath:kafka.properties"/> -->
-	<bean class="com.dev.share.kafka.spring.SpringContextHolder" lazy-init="false"/>
+	<context:property-placeholder location="classpath*:*.properties"/>
+	<bean class="com.dev.share.spring.SpringContextHolder" lazy-init="false"/>
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
@@ -23,6 +23,7 @@
 		</property>
 	</bean>
 	<import resource="classpath:spring-kafka.xml"/>
+	<import resource="classpath:spring-cache.xml"/>
 	<bean class="org.springframework.context.support.ClassPathXmlApplicationContext">
 		<constructor-arg name="configLocation" value="#{${kafka.enabled}?'classpath:spring-kafka.xml':'classpath:servlet-context.xml'}"/>
 	</bean>

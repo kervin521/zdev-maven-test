@@ -1,4 +1,4 @@
-package com.dev.share.kafka.spring;
+package com.dev.share.spring;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

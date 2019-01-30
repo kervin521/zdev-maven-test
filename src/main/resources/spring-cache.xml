@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd"
+	   default-init-method="init_dependence" default-lazy-init="true">
+	<import resource="classpath:cache4j.xml"/>
+	<!-- 账户信息缓存 -->
+	<bean id="appProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>appProcessInnerCache</value>
+		</property>
+	</bean>
+	
+	<!-- 账户状态报告计数缓存 -->
+	<bean id="appReportProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>appReportProcessInnerCache</value>
+		</property>
+	</bean>
+	
+	<!-- 账户固签缓存 -->
+	<bean id="appSignProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>appSignProcessInnerCache</value>
+		</property>
+	</bean>
+	
+	<!-- 接口-唯一ID缓存 -->
+	<bean id="apiUniqueProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>apiUniqueProcessInnerCache</value>
+		</property>
+	</bean>
+
+	<!-- 下行预处理-批次号缓存 -->
+	<bean id="mtBatchProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>mtBatchProcessInnerCache</value>
+		</property>
+	</bean>
+
+	<!-- 下行预处理-内容审核缓存 -->
+	<bean id="mtContentCheckProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>mtContentCheckProcessInnerCache</value>
+		</property>
+	</bean>
+
+	<!-- 下行预处理-路由缓存 -->
+	<bean id="mtRouteResultProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>mtRouteResultProcessInnerCache</value>
+		</property>
+	</bean>
+
+	<!-- 下行预处理-多次审核通过的是否直接免审通过 -->
+	<bean id="mtAutoPassProcessInnerCache" class="com.dev.share.cache4j.Cache" scope="singleton">
+		<property name="name"><!-- 缓存的名称 -->
+			<value>mtAutoPassProcessInnerCache</value>
+		</property>
+	</bean>
+</beans>

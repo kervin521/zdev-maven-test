@@ -8,6 +8,33 @@ import java.util.zip.GZIPOutputStream;
 
 public class StringUtils extends org.apache.commons.lang.StringUtils {
 
+	public static String capacity(double size,boolean isBit) {
+		String capacity = "";
+		double diff = isBit?size/8:size;
+		double kb = diff/1024;
+		if(kb<1024) {
+			if(kb<1) {
+				capacity = String.format("%.2f", diff)+"B";
+			}else {
+				capacity = String.format("%.2f", kb)+"KB";
+			}
+			return capacity;
+		}
+		double mb = diff/(1024*1024);
+		if(mb<1024) {
+			capacity = String.format("%.2f", mb)+"MB";
+			return capacity;
+		}
+		double gb = diff/(1024*1024*1024);
+		if(gb<1024) {
+			capacity = String.format("%.2f", gb)+"GB";
+			return capacity;
+		}else {
+			double tb = diff/(1024*1024*1024*1024);
+			capacity = String.format("%.2f", tb)+"TB";
+		}
+		return capacity;
+	}
 	public static String time(long start,long end) {
 		String time = "";
 		if(start>end) {
@@ -112,5 +139,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 			}
 		}
 		return target;
+	}
+	public static void main(String[] args) {
+		System.out.println(capacity(24144, false));
 	}
 }
