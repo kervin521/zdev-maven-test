@@ -4,20 +4,26 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Slf4jReporter;
 import com.codahale.metrics.Slf4jReporter.LoggingLevel;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.jvm.CachedThreadStatesGaugeSet;
 import com.codahale.metrics.jvm.ClassLoadingGaugeSet;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import com.dev.share.ThreadPool.ShutdownHook;
+import com.dev.share.util.StringUtils;
+
 
 public class MetricsHandler {
 	private static MetricRegistry registry = new MetricRegistry();
@@ -25,28 +31,66 @@ public class MetricsHandler {
 	private volatile static Map<String,Counter> counters = new ConcurrentHashMap<String,Counter>();
 	private volatile static Map<String,Histogram> histograms = new ConcurrentHashMap<String,Histogram>();
 	private volatile static Map<String,Timer> timers = new ConcurrentHashMap<String,Timer>();
-	public static MetricRegistry registry() {
-		return registry;
+	static {
+		init();
 	}
-	public static void jvm() {
-		registry.register("jvm.mem", new MemoryUsageGaugeSet());
-		registry.register("jvm.gc", new GarbageCollectorMetricSet());
-		registry.register("jvm.thread", new ThreadStatesGaugeSet());
-		registry.register("jvm.class.load", new ClassLoadingGaugeSet());
-		registry.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.SECONDS));
+	/**
+	  * 描述: 自动注册Metric监控
+	  * 作者: ZhangYi
+	  * 时间: 2019年2月2日 下午3:22:15
+	  * 参数: (参数列表)
+	 */
+	public static void init() {
+		boolean enabled = Boolean.valueOf(System.getProperty("metric.enabled","true"));
+		if(enabled) {
+			long period = 5*1000;
+			String time = System.getProperty("metric.period","5000");//默认5秒
+			if(!StringUtils.isEmpty(time)) {
+				if(NumberUtils.isNumber(time)) {
+					period = NumberUtils.toLong(time);
+				}else {
+					if(time.contains("\\*")) {
+						for(String num:time.split("\\*")) {
+							period *=  NumberUtils.toLong(num);
+						}
+					}
+				}
+			}
+			ScheduledReporter monitor = null;//自动加入Metrics性能监控
+			String mode = System.getProperty("metric.mode","slf4j");//console/slf4j
+			if(mode.equalsIgnoreCase("console")) {
+				monitor = console();
+			}else {
+				monitor = MetricsHandler.slf4j();
+			}
+			monitor.start(period, TimeUnit.MILLISECONDS);
+			ShutdownHook.add(monitor);
+		}
+	}
+	private static void jvm() {
+		boolean enabled = Boolean.valueOf(System.getProperty("metric.jvm.enabled"));
+		if(enabled) {
+			registry.register("jvm.mem", new MemoryUsageGaugeSet());
+			registry.register("jvm.gc", new GarbageCollectorMetricSet());
+			registry.register("jvm.thread", new ThreadStatesGaugeSet());
+			registry.register("jvm.class.load", new ClassLoadingGaugeSet());
+			registry.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.SECONDS));
+		}
 	}
 	public static ConsoleReporter console(){
 		ConsoleReporter console = ConsoleReporter.forRegistry(registry).build();
+		jvm();
 		return console;
 	}
 	public static Slf4jReporter slf4j(){
-		Slf4jReporter slf4j = Slf4jReporter.forRegistry(registry).build();
+		String level = System.getProperty("metric.logger.level","debug");
+		LoggingLevel mlevel= LoggingLevel.valueOf(level.toUpperCase())==null?LoggingLevel.DEBUG:LoggingLevel.valueOf(level.toUpperCase());
+		Slf4jReporter slf4j = Slf4jReporter.forRegistry(registry).withLoggingLevel(mlevel).build();
+		jvm();
 		return slf4j;
 	}
-	public static Slf4jReporter slf4j(String level){
-		LoggingLevel mlevel= (level==null||level.trim().length()==0||LoggingLevel.valueOf(level.toUpperCase())==null?LoggingLevel.INFO:LoggingLevel.valueOf(level.toUpperCase()));
-		Slf4jReporter slf4j = Slf4jReporter.forRegistry(registry).withLoggingLevel(mlevel).build();
-		return slf4j;
+	public static MetricRegistry registry() {
+		return registry;
 	}
 	public static Meter meter(String name){
 		Meter metric = registry.meter(name);

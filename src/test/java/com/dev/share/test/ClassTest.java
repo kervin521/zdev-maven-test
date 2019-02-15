@@ -1,13 +1,10 @@
 package com.dev.share.test;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.beanutils.BeanUtils;
 
 import redis.clients.jedis.Connection;
 

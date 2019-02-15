@@ -18,8 +18,6 @@ import com.dev.share.metrics.MetricsHandler;
 import com.dev.share.util.CipherUtils;
 import com.dev.share.util.StringUtils;
 
-import ch.qos.logback.classic.Level;
-
 public class CipherTest {
 	private static Logger logger = LoggerFactory.getLogger(CipherTest.class);
 	public static int core = Runtime.getRuntime().availableProcessors();
@@ -30,7 +28,7 @@ public class CipherTest {
 //	public static Meter ECC = MetricsHandler.meter("ECC");
 //	public static Meter MD5 = MetricsHandler.meter("MD5");
 	public static void mutiPool(int size) {
-		Slf4jReporter slf4j = MetricsHandler.slf4j(Level.DEBUG.toString());
+		Slf4jReporter slf4j = MetricsHandler.slf4j();
   		slf4j.start(1, TimeUnit.SECONDS);
 		for(int i=0;i<size;i++) {
 			shedule.execute(new AbstractRunnable(i) {

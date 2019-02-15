@@ -30,7 +30,7 @@ public class SpringXMLKafkaTest {
 	public static void producer() throws IOException, InterruptedException, ConfigurationException {
 		ctx.registerShutdownHook();
 		ctx.start();
-		Slf4jReporter slf4j = MetricsHandler.slf4j(Level.DEBUG.toString());
+		Slf4jReporter slf4j = MetricsHandler.slf4j();
   		slf4j.start(1, TimeUnit.SECONDS);
 		final KafkaProducerService kafkaProducerService = ctx.getBean(KafkaProducerService.class);
 		schedule.scheduleAtFixedRate(new Runnable() {

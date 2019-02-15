@@ -31,7 +31,7 @@ public class SpringTest {
 	public static void init() {
 		ctx.registerShutdownHook();
 		ctx.start();
-		Slf4jReporter slf4j = MetricsHandler.slf4j(Level.DEBUG.toString());
+		Slf4jReporter slf4j = MetricsHandler.slf4j();
   		slf4j.start(5, TimeUnit.SECONDS);
   		int size = 10;
   		for(int i=0;i<size;i++) {
@@ -79,7 +79,7 @@ public class SpringTest {
   						System.out.println("======>["+date+"]|["+threadName+"]|["+name+","+flag+"] Success=======================================");
 //  						logger.info("==========================================>["+name+","+flag+"] Success=======================================");
   						try {
-  							Thread.sleep(5*1000l);
+  							Thread.sleep(20*1000l);
   						} catch (InterruptedException e) {
   							e.printStackTrace();// 异常信息
   						}

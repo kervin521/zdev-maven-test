@@ -63,7 +63,6 @@ public abstract class AbstractCache implements Serializable {
 		if (distributedCache == null) {
 			throw new IllegalArgumentException("distributedCache constructor error~");
 		}
-		System.out.println("------------------------------------------1["+name+"]-------------------------------------\n\n\n");
 		RCacheConfig config = distributedCache.getConfig(name);
 		if (cache == null) {
 			try {
@@ -72,7 +71,6 @@ public abstract class AbstractCache implements Serializable {
 				logger.error("--初始化JVM二级缓存失败!",e);
 			}
 		}
-		System.out.println("------------------------------------------2["+name+"]-------------------------------------\n\n\n");
 		if (cache == null) {
 			throw new IllegalArgumentException("cacheImpl constructor error~");
 		}
@@ -90,7 +88,6 @@ public abstract class AbstractCache implements Serializable {
 	 * reference 包含在高速缓存对象的引用的类型。可能的值有：strong soft
 	 */
 	private CacheConfig getConfig(RCacheConfig config) {
-		System.out.println("-------------------------------------------------------------------------------\n\n\n");
 		if(config.getTtl()>0) {
 			this.ttl = config.getTtl() * 1000/2;
 		}
@@ -112,8 +109,6 @@ public abstract class AbstractCache implements Serializable {
 		if(maxSize <= 0) {
 			maxSize = 10000;
 		}
-		System.out.println("------------------------------------------22{name:"+name+",ttl:"+StringUtils.time(0, ttl)+",idleTime:"+StringUtils.time(0, idleTime)+",reference:"+reference+",algorithm:"+algorithm+",maxMemorySize:"+StringUtils.capacity(maxMemorySize, false)+",maxSize:"+maxSize+"}-------------------------------------");
-		System.out.println("-------------------------------------------------------------------------------\n\n\n");
 		CacheConfig conf =  new CacheConfigImpl(name, null, ttl, idleTime, maxMemorySize, maxSize, null, algorithm, reference);
 		return conf;
 	}

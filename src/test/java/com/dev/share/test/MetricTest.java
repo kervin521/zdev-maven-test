@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.management.MBeanServer;
 
 import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.Timer.Context;
@@ -42,15 +43,17 @@ public class MetricTest {
 		metrics.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.MILLISECONDS));
 		metrics.register("jvm.buffer.pool", new BufferPoolMetricSet(org.mockito.Mockito.mock(MBeanServer.class)));
 	}
+	public static void web() {
+		Metric.Config
+	    .WithHttpEndpoint("http://localhost:1234/metrics/")
+	    .WithAllCounters()
+	    .WithInternalMetrics()
+	    .WithReporting(config => config
+	        .WithConsoleReport(TimeSpan.FromSeconds(30));
+	}
 	public static void main(String[] args) {
 		console.start(1, TimeUnit.SECONDS);
-		jvm();
 		test();
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				console.close();
-			}
-		});
 	}
 
 }
