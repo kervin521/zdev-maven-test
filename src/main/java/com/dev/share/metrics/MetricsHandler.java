@@ -14,6 +14,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Slf4jReporter;
 import com.codahale.metrics.Slf4jReporter.LoggingLevel;
+import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jvm.CachedThreadStatesGaugeSet;
@@ -26,7 +27,8 @@ import com.dev.share.util.StringUtils;
 
 
 public class MetricsHandler {
-	private static MetricRegistry registry = new MetricRegistry();
+	private final static MetricRegistry registry = new MetricRegistry();
+	private final static HealthCheckRegistry healthCheck = new HealthCheckRegistry();
 	private volatile static Map<String,Meter> meters = new ConcurrentHashMap<String,Meter>();
 	private volatile static Map<String,Counter> counters = new ConcurrentHashMap<String,Counter>();
 	private volatile static Map<String,Histogram> histograms = new ConcurrentHashMap<String,Histogram>();
@@ -91,6 +93,9 @@ public class MetricsHandler {
 	}
 	public static MetricRegistry registry() {
 		return registry;
+	}
+	public static HealthCheckRegistry healthCheck() {
+		return healthCheck;
 	}
 	public static Meter meter(String name){
 		Meter metric = registry.meter(name);

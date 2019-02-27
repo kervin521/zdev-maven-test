@@ -169,6 +169,6 @@ public class ClassTest {
 		System.out.println(path5);
 	}
 	public static void main(String[] args) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		new ClassTest().session();
+		new ClassTest().test();
 	}
 }

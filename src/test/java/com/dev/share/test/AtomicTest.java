@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import com.dev.share.ThreadPool.AbstractRunnable;
 
@@ -35,18 +36,32 @@ public class AtomicTest {
 //			Thread.sleep(2000);
 //			System.out.println(flag+"-------------------------"+atomic.get());
 //		}
+//		for(int i=0;i<10;i++) {
+//			shedule.execute(new AbstractRunnable(i) {
+//				@Override
+//				public void run() {
+//					System.out.println(this.getWorker()+":"+MessageID.INS.get(0));
+//				}
+//			});
+//					
+//		}
+//		for(int i=0;i<10;i++) {
+//			System.out.println(i+":"+MessageID.INS.get());
+//		}
+		LongAdder adder = new LongAdder();
 		for(int i=0;i<10;i++) {
 			shedule.execute(new AbstractRunnable(i) {
 				@Override
 				public void run() {
-					System.out.println(this.getWorker()+":"+MessageID.INS.get(0));
+					adder.increment();
+					adder.increment();
+					System.out.println(this.getWorker()+":"+adder.sum());
+					if(adder.intValue()==15) {
+						System.out.println(this.getWorker()+"="+adder.sumThenReset());
+					}
 				}
 			});
-					
 		}
-//		for(int i=0;i<10;i++) {
-//			System.out.println(i+":"+MessageID.INS.get());
-//		}
 	}
 
 }

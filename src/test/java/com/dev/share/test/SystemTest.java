@@ -1,5 +1,8 @@
 package com.dev.share.test;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -83,8 +86,20 @@ public class SystemTest {
 		}
 		System.out.println("-----------------------------[end]------------------------");
 	}
+	public static void env() {
+		Properties properties = System.getProperties();
+		for (Entry<Object, Object> entry : properties.entrySet()) {
+			System.out.println(entry.getKey()+"="+entry.getValue());
+		}
+		System.out.println("-----------------------------env------------------------");
+		Map<String, String> env = System.getenv();
+		for (Entry<String, String> entry : env.entrySet()) {
+			System.out.println(entry.getKey()+"="+entry.getValue());
+		}
+	}
 	public static void main(String[] args) {
-		exit();
+//		exit();
 //		shutdown();
+		env();
 	}
 }
