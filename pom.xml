@@ -87,6 +87,11 @@
            <version>0.4</version>
        </dependency>
        <dependency>
+		    <groupId>org.ehcache</groupId>
+		    <artifactId>ehcache</artifactId>
+		    <version>3.7.0</version>
+		</dependency>
+       <dependency>
 		    <groupId>ch.qos.logback</groupId>
 		    <artifactId>logback-access</artifactId>
 		    <version>1.2.3</version>

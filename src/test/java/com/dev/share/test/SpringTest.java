@@ -16,7 +16,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Slf4jReporter;
-import com.dev.share.cache4j.Cache;
+import com.dev.share.cache4j.SynCache;
 import com.dev.share.metrics.MetricsHandler;
 
 import ch.qos.logback.classic.Level;
@@ -46,13 +46,13 @@ public class SpringTest {
   						String name = "apiUniqueProcessInnerCache";
   						String sign = "[sign]";
   						String content = sign+"123456_"+random;
-  						Cache cache = ctx.getBean("apiUniqueProcessInnerCache",Cache.class);
+  						SynCache cache = ctx.getBean("apiUniqueProcessInnerCache",SynCache.class);
   						if(type!=0) {
   							if(type==1) {
-  								cache = ctx.getBean("mtRouteResultProcessInnerCache",Cache.class);
+  								cache = ctx.getBean("mtRouteResultProcessInnerCache",SynCache.class);
   								name = "mtRouteResultProcessInnerCache";
   							}else {
-  								cache = ctx.getBean("appProcessInnerCache",Cache.class);
+  								cache = ctx.getBean("appProcessInnerCache",SynCache.class);
   								name = "appProcessInnerCache";
   							}
   						}
