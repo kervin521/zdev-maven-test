@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -69,6 +70,11 @@ public class StringTest {
 //		for(int i=0;i<20;i++) {
 //			System.out.println(String.format("%02d", 5));
 //		}
+		String fileName = "设备诊断与预测性维护系统-软件设计说明书.doc";
+		System.out.println(Pattern.matches("[\u2E80-\u9FFF]", fileName));
+		System.out.println(Pattern.compile("[\u2E80-\u9FFF]").matcher(fileName).find());
+		System.out.println(Pattern.compile("[\u4e00-\u9fa5]").matcher(fileName).find());
+		System.out.println(Pattern.compile("[^\\x00-\\xff]").matcher(fileName).find());
 	}
 
 }
