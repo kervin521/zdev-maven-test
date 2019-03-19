@@ -68,37 +68,37 @@
 			<version>0.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.drools</groupId>
-		    <artifactId>drools-benchmark</artifactId>
-		    <version>7.18.0.Final</version>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-benchmark</artifactId>
+			<version>7.18.0.Final</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.openjdk.jmh</groupId>
-		    <artifactId>jmh-java-benchmark-archetype</artifactId>
-		    <version>1.21</version>
-		</dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.21</version>
-        </dependency>
-        <dependency>
-		    <groupId>org.openjdk.jmh</groupId>
-		    <artifactId>jmh-core-benchmarks</artifactId>
-		    <version>1.21</version>
-		    <scope>test</scope>
-		</dependency>
-        <dependency>
-		    <groupId>org.openjdk.jmh</groupId>
-		    <artifactId>jmh-generator-bytecode</artifactId>
-		    <version>1.21</version>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-java-benchmark-archetype</artifactId>
+			<version>1.21</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.thoughtworks.xstream</groupId>
-		    <artifactId>xstream-benchmark</artifactId>
-		    <version>1.3.1</version>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>1.21</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core-benchmarks</artifactId>
+			<version>1.21</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-bytecode</artifactId>
+			<version>1.21</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream-benchmark</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -300,11 +300,8 @@
 			<version>db2jcc4</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>ojdbc</groupId>
-			<artifactId>ojdbc</artifactId>
-			<version>14</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>ojdbc</groupId> <artifactId>ojdbc</artifactId> 
+			<version>14</version> </dependency> -->
 
 		<dependency>
 			<groupId>com.hynnet</groupId>
@@ -420,11 +417,8 @@
 			<version>3.1</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.safehaus.jug</groupId>
-			<artifactId>jug</artifactId>
-			<version>2.0.0</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.safehaus.jug</groupId> <artifactId>jug</artifactId> 
+			<version>2.0.0</version> </dependency> -->
 
 		<dependency>
 			<groupId>com.fasterxml.uuid</groupId>
@@ -675,9 +669,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<!-- <repositories>
-		<repository>
-			<url>http://domingo.cvs.sourceforge.net/domingo/domingo/</url>
-		</repository>
-	</repositories> -->
+	<!-- <repositories> <repository> <url>http://domingo.cvs.sourceforge.net/domingo/domingo/</url> 
+		</repository> </repositories> -->
 </project>
