@@ -15,6 +15,7 @@ public class DateTest {
 		Date datetime = format.parse("2019-12-31 23:59:59");
 		System.out.println(datetime);
 		System.out.println(datetime.getTime());
+		System.out.println(datetime.getYear());
 		String date = format.format(datetime);
 		System.out.println(date);
 	}

@@ -1,20 +1,28 @@
 package com.dev.share.util;
 
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * <pre>
- * 项目:ReserveMeeting
+ * 
  * 描述:日期工具类
  * 说明:[例如:公元2016年07月31日 上午 10时15分15秒361毫秒 CST+0800(当前日期为:本年第32周,本月第6周,本年第213天,本月第5星期的星期日)]
  * (
@@ -24,14 +32,13 @@ import org.apache.logging.log4j.Logger;
  * zzz:时区标识[CST/GMT],Z:时区[例如:+0800],G:年限标识(公元)
  * )
  * 作者:ZhangYi
- * 时间:2016年6月23日 上午11:18:01
+ * 时间:2018年3月15日 下午1:30:11
  * 版本:wrm_v4.0
  * JDK:1.7.80
- * </pre>
  */
 public class DateUtils {
 
-	private static Logger logger = LogManager.getLogger(DateUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
 	/**
 	 * 日期分隔符(-)
@@ -66,7 +73,7 @@ public class DateUtils {
 	 */
 	public static final String	FORMAT_DATE_TIME				= "yyyy-MM-dd HH:mm";
 	/**
-	 * 日期时间格式[时间戳(dd HH:mm)]
+	 * 日期时间格式[时间戳(MM-dd HH:mm)]
 	 */
 	public static final String	FORMAT_PATTERN_DATE_TIME		= "MM-dd HH:mm";
 	/**
@@ -96,15 +103,15 @@ public class DateUtils {
 	public static final long	ONE_DAY							= 1000l * 60 * 60 * 24;
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:[日期型]日期转化指定格式字符串
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午3:25:25
+	 * 时间:2018年3月15日 下午3:25:25
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @param format	日期格式(默认:yyyy-MM-dd HH:mm:ss)
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date formatDateTime(String dateTime, String format) {
 		try {
@@ -118,17 +125,39 @@ public class DateUtils {
 		}
 		return null;
 	}
-
-	/**
-	 * <pre>
-	 * 描述:[字符串型]日期转化指定格式字符串
+   /**
+	 * 
+	 * 描述:[日期型]日期转化指定格式字符串
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午3:25:25
+	 * 时间:2018年3月15日 下午3:25:25
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @param format	日期格式(默认:yyyy-MM-dd HH:mm:ss)
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatLocalDateTime(String dateTime, String format) {
+		try {
+			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+			if (dateTime != null) {
+				return LocalDateTime.parse(dateTime, formatter);
+			}
+		} catch (Exception e) {
+			logger.error("--日期转化指定格式[" + format + "]字符串失败!", e);
+		}
+		return null;
+	}
+	/**
+	 * 
+	 * 描述:[字符串型]日期转化指定格式字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午3:25:25
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @param format	日期格式(默认:yyyy-MM-dd HH:mm:ss)
+	 * @return
+	 * 
 	 */
 	public static String formatDateTimeStr(Date dateTime, String format) {
 		try {
@@ -142,22 +171,69 @@ public class DateUtils {
 		}
 		return null;
 	}
-
+/**
+	 * 
+	 * 描述:[字符串型]日期转化指定格式字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午3:25:25
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @param format	日期格式(默认:yyyy-MM-dd HH:mm:ss)
+	 * @return
+	 * 
+	 */
+	public static String formatDateTimeStr(LocalDateTime dateTime, String format) {
+		try {
+			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+			if (dateTime != null) {
+				ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+				return zone.format(formatter);
+			}
+		} catch (Exception e) {
+			logger.error("--日期转化指定格式[" + format + "]字符串失败!", e);
+		}
+		return null;
+	}
 	/**
-	 * <pre>
+	 * 
+	 * 描述:[字符串型]日期转化指定格式字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午3:25:25
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @param format	日期格式(默认:yyyy-MM-dd HH:mm:ss)
+	 * @return
+	 * 
+	 */
+	public static String formatDateTimeStr(LocalDate dateTime, String format) {
+		try {
+			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+			if (dateTime != null) {
+				ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
+				return zone.format(formatter);
+			}
+		} catch (Exception e) {
+			logger.error("--日期转化指定格式[" + format + "]字符串失败!", e);
+		}
+		return null;
+	}
+	/**
+	 * 
 	 * 描述:字符串转日期型(日期格式[yyyy-MM-dd HH:mm:ss])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期字符串(格式:'yyyy-MM-dd HH:mm:ss'或毫秒时间戳值或'yyyy-MM-dd HH:mm')
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date formatDateTime(String dateTime) {
 		if (StringUtils.isEmpty(dateTime)) return null;
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE_TIME);
-			if (NumberUtil.isNumber(dateTime)) {
+			if (NumberUtils.isNumber(dateTime)) {
 				Date date = new Date(Long.parseLong(dateTime));
 				dateTime = sdf.format(date);
 			} else {
@@ -175,22 +251,110 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:字符串转日期型(日期格式[yyyy-MM-dd HH:mm:ss])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期字符串(格式:'yyyy-MM-dd HH:mm:ss'或毫秒时间戳值或'yyyy-MM-dd HH:mm')
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime formatLocalDateTime(String dateTime) {
+		if (StringUtils.isEmpty(dateTime)) return null;
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE_TIME);
+			if (NumberUtils.isNumber(dateTime)) {
+		        LocalDateTime localDateTime = dateToDateTime(new Date(Long.parseLong(dateTime)));
+				ZonedDateTime zone = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+				dateTime = zone.format(formatter);
+			} else {
+				if (!dateTime.contains(":")) {
+					dateTime = dateTime + " 00:00:00";
+				} else {
+					if (dateTime.length() < 19) {
+						dateTime = dateTime + ":00";
+					}
+				}
+			}
+			return LocalDateTime.parse(dateTime, formatter);
+		} catch (Exception e) {
+			logger.error("日期时间格式转换错误：", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	  * 描述: Date转LocalDateTime
+	  * 作者: ZhangYi
+	  * 时间: 2019年3月21日 下午3:59:21
+	  * 参数: (参数列表)
+	  * @param date 转换日期
+	  * @return
+	 */
+	public static LocalDateTime dateToDateTime(Date date) {
+		Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
+        return dateTime;
+	}
+	/**
+	 * 描述: Date转LocalDate
+	 * 作者: ZhangYi
+	 * 时间: 2019年3月21日 下午3:59:21
+	 * 参数: (参数列表)
+	 * @param date 转换日期
+	 * @return
+	 */
+	public static LocalDate dateToLocalDate(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
+		return dateTime.toLocalDate();
+	}
+	/**
+	  * 描述: LocalDateTime转Date
+	  * 作者: ZhangYi
+	  * 时间: 2019年3月21日 下午3:59:21
+	  * 参数: (参数列表)
+	  * @param dateTime 转换日期
+	  * @return
+	 */
+	public static Date dateTimeToDate(LocalDateTime dateTime) {
+		ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime zdt = dateTime.atZone(zoneId);
+        Date date = Date.from(zdt.toInstant());
+        return date;
+	}
+	/**
+	 * 描述: LocalDate转Date
+	 * 作者: ZhangYi
+	 * 时间: 2019年3月21日 下午3:59:21
+	 * 参数: (参数列表)
+	 * @param dateTime 转换日期
+	 * @return
+	 */
+	public static Date dateTimeToDate(LocalDate dateTime) {
+		ZoneId zoneId = ZoneId.systemDefault();
+		ZonedDateTime zdt = dateTime.atStartOfDay().atZone(zoneId);
+		Date date = Date.from(zdt.toInstant());
+		return date;
+	}
+	/**
+	 * 
 	 * 描述:字符串转日期型(日期格式[yyyy-MM-dd])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期字符串(格式:'yyyy-MM-dd HH:mm:ss'或毫秒时间戳值或'yyyy-MM-dd')
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date formatDate(String dateTime) {
 		if (StringUtils.isEmpty(dateTime)) return null;
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE);
-			if (NumberUtil.isNumber(dateTime)) {
+			if (NumberUtils.isNumber(dateTime)) {
 				Date date = new Date(Long.parseLong(dateTime));
 				dateTime = sdf.format(date);
 			}
@@ -200,32 +364,56 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:字符串转日期型(日期格式[yyyy-MM-dd])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期字符串(格式:'yyyy-MM-dd HH:mm:ss'或毫秒时间戳值或'yyyy-MM-dd')
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatLocalDate(String dateTime) {
+		if (StringUtils.isEmpty(dateTime)) return null;
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
+			if (NumberUtils.isNumber(dateTime)) {
+				LocalDateTime localDateTime = dateToDateTime(new Date(Long.parseLong(dateTime)));
+				ZonedDateTime zone = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+				dateTime = zone.format(formatter);
+			}
+			return LocalDate.parse(dateTime,formatter);
+		} catch (Exception e) {
+			logger.error("日期时间格式转换错误：", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	 * 
 	 * 描述:转化指定日期(时分秒置为0)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:14:15
+	 * 时间:2018年3月15日 下午4:14:15
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date formatDate(Date dateTime) {
-		String startTime = formatDateStr(dateTime);
-		dateTime = formatDate(startTime);
+		String date = formatDateStr(dateTime);
+		dateTime = formatDate(date);
 		return dateTime;
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd HH:mm:ss])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatDateTimeStr(Date dateTime) {
 		try {
@@ -236,16 +424,35 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd HH:mm:ss])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
+	 */
+	public static String formatDateTimeStr(LocalDateTime dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE_TIME);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("转化日期格式错误：", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	 * 
 	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd HH:mm])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatDateHMTimeStr(Date dateTime) {
 		try {
@@ -256,16 +463,35 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd HH:mm])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
+	 */
+	public static String formatDateHMTimeStr(LocalDateTime dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_DATE_TIME);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("--日期型转字符串(日期格式[yyyy-MM-dd HH:mm])失败!", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	 * 
 	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatDateStr(Date dateTime) {
 		try {
@@ -276,16 +502,55 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
+	 */
+	public static String formatDateStr(LocalDateTime dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("--日期型转字符串(日期格式[yyyy-MM-dd])失败!", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	 * 
+	 * 描述:日期型转字符串(日期格式[yyyy-MM-dd])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
+	 */
+	public static String formatDateStr(LocalDate dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("--日期型转字符串(日期格式[yyyy-MM-dd])失败!", e);
+			return null;
+		}
+	}
+	/**
+	 * 
 	 * 描述:日期型转字符串(日期格式[HH:mm:ss])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatTimeStr(Date dateTime) {
 		try {
@@ -296,16 +561,35 @@ public class DateUtils {
 			return null;
 		}
 	}
-
+   /**
+	 * 
+	 * 描述:日期型转字符串(日期格式[HH:mm:ss])
+	 * 作者:ZhangYi
+	 * 时间:2016年4月15日 上午10:34:57
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
+	 */
+	public static String formatTimeStr(LocalDateTime dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_TIME);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("--日期型转字符串(日期格式[HH:mm:ss])失败!", e);
+			return null;
+		}
+	}
 	/**
-	 * <pre>
+	 * 
 	 * 描述:日期型转字符串(日期格式[HH:mm])
 	 * 作者:ZhangYi
 	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatHMStr(Date dateTime) {
 		try {
@@ -316,39 +600,36 @@ public class DateUtils {
 			return null;
 		}
 	}
-
 	/**
-	 * <pre>
-	 * 描述:日期转XMLGregorianCalendar
+	 * 
+	 * 描述:日期型转字符串(日期格式[HH:mm])
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:13:36
-	 * 参数：(参数列表)
-	 * @param date	日期
-	 * @return
-	 * </pre>
-	 */
-	public static XMLGregorianCalendar getXMLCalendar(Date date) {
-		DatatypeFactory datatypeFactory = null;
-		try {
-			datatypeFactory = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException e) {
-			logger.error("获取时间转换工厂时发生错误", e);
-		}
-		GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		XMLGregorianCalendar datetime = datatypeFactory.newXMLGregorianCalendar(calendar);
-		return datetime;
-	}
-
-	/**
-	 * <pre>
-	 * 描述:日期格式校验(日期格式[yyyy-MM-dd HH:mm:ss])
-	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:27:42
+	 * 时间:2016年4月15日 上午10:34:57
 	 * 参数：(参数列表)
 	 * @param dateTime	日期时间
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static String formatHMStr(LocalDateTime dateTime) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_PATTERN_TIME);
+			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+			return zone.format(formatter);
+		} catch (Exception e) {
+			logger.error("--日期型转字符串(日期格式[HH:mm])失败!", e);
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * 描述:日期格式校验(日期格式[yyyy-MM-dd HH:mm:ss])
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:27:42
+	 * 参数：(参数列表)
+	 * @param dateTime	日期时间
+	 * @return
+	 * 
 	 */
 	public static boolean isDateTime(String dateTime) {
 		if (dateTime == null) return false;
@@ -363,15 +644,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定分钟后日期(例如:每30分钟)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔分钟
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByMinute(Date dateTime, int interval) {
 		try {
@@ -384,17 +665,36 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定分钟后日期(例如:每30分钟)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔分钟
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByMinute(LocalDateTime dateTime, int interval) {
+		try {
+			dateTime= interval>0?dateTime.plusMinutes(interval):dateTime.minusMinutes(Math.abs(interval));
+		} catch (Exception e) {
+			logger.error("--间隔指定分钟后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定小时后日期(例如:每3小时)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔小时
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByHour(Date dateTime, int interval) {
 		try {
@@ -407,17 +707,36 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定小时后日期(例如:每3小时)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔小时
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByHour(LocalDateTime dateTime, int interval) {
+		try {
+			dateTime= interval>0?dateTime.plusHours(interval):dateTime.minusHours(Math.abs(interval));
+		} catch (Exception e) {
+			logger.error("--间隔指定小时后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定天数后日期(例如:每3天)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔天数
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByDay(Date dateTime, int interval) {
 		try {
@@ -430,18 +749,37 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定天数后日期(例如:每3天)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔天数
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByDay(LocalDateTime dateTime, int interval) {
+		try {
+			dateTime= interval>0?dateTime.plusDays(interval):dateTime.minusDays(Math.abs(interval));
+		} catch (Exception e) {
+			logger.error("--间隔指定天数后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定月数的指定天数后日期(例如:每月1日)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔月数(间隔几个月)
 	 * @param day		指定天数
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByMonth(Date dateTime, int interval, int day) {
 		try {
@@ -455,19 +793,40 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定月数的指定天数后日期(例如:每月1日)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔月数(间隔几个月)
+	 * @param day		指定天数
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByMonth(LocalDateTime dateTime, int interval, int day) {
+		try {
+			dateTime= interval>0?dateTime.plusMonths(interval):dateTime.minusMonths(Math.abs(interval));
+			dateTime= dateTime.withDayOfMonth(day);
+		} catch (Exception e) {
+			logger.error("--间隔指定月数的指定天数后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定月数的指定周数指定星期数后日期(例如:每3个月第一个星期一)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔月数(间隔几个月)
 	 * @param num		指定周数(1-4:第几个星期)
 	 * @param week		指定周几(1-7:周一至周日,-1:不指定周几(JDK默认星期一))
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByMonth(Date dateTime, int interval, int num, int week) {
 		try {
@@ -490,19 +849,41 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定月数的指定周数指定星期数后日期(例如:每3个月第一个星期一)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔月数(间隔几个月)
+	 * @param num		指定周数(1-4:第几个星期)
+	 * @param week		指定周几(1-7:周一至周日,-1:不指定周几(JDK默认星期一))
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByMonth(LocalDateTime dateTime, int interval, int num, int week) {
+		try {
+			dateTime= interval>0?dateTime.plusMonths(interval):dateTime.minusMonths(Math.abs(interval));
+			dateTime= dateTime.with(TemporalAdjusters.dayOfWeekInMonth(num, DayOfWeek.of(week)));
+		} catch (Exception e) {
+			logger.error("--间隔指定月数的指定周数指定星期数后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:间隔指定年数的指定月份指定天数后日期(例如:每年1月1日)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔年(间隔几年)
 	 * @param month		指定月份(1-12:月份)
 	 * @param day		指定天数
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByYear(Date dateTime, int interval, int month, int day) {
 		try {
@@ -517,12 +898,33 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
-
 	/**
-	 * <pre>
+	 * 
+	 * 描述:间隔指定年数的指定月份指定天数后日期(例如:每年1月1日)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔年(间隔几年)
+	 * @param month		指定月份(1-12:月份)
+	 * @param day		指定天数
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByYear(LocalDateTime dateTime, int interval, int month, int day) {
+		try {
+			dateTime= interval>0?dateTime.plusYears(interval):dateTime.minusYears(Math.abs(interval));
+			dateTime= dateTime.withMonth(month).withDayOfMonth(day);
+		} catch (Exception e) {
+			logger.error("--间隔指定年数的指定月份指定天数后日期异常!", e);
+		}
+		return dateTime;
+	}
+	/**
+	 * 
 	 * 描述:间隔指定年数的指定月份指定周数指定星期数后日期(例如:每年1月份第一个星期一)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:29:07
+	 * 时间:2018年3月15日 下午4:29:07
 	 * 参数：(参数列表)
 	 * @param dateTime	指定日期
 	 * @param interval	间隔年(间隔几年)
@@ -530,7 +932,7 @@ public class DateUtils {
 	 * @param num		指定周数(1-4:第几个星期)
 	 * @param week		指定周几(1-7:周一至周日,-1:不指定周几[默认星期一])
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date handleDateTimeByYear(Date dateTime, int interval, int month, int num, int week) {
 		try {
@@ -554,16 +956,39 @@ public class DateUtils {
 		}
 		return dateTime;
 	}
+	/**
+	 * 
+	 * 描述:间隔指定年数的指定月份指定周数指定星期数后日期(例如:每年1月份第一个星期一)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:29:07
+	 * 参数：(参数列表)
+	 * @param dateTime	指定日期
+	 * @param interval	间隔年(间隔几年)
+	 * @param month		指定月份(1-12:月份)
+	 * @param num		指定周数(1-4:第几个星期)
+	 * @param week		指定周几(1-7:周一至周日,-1:不指定周几[默认星期一])
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime handleDateTimeByYear(LocalDateTime dateTime, int interval, int month, int num, int week) {
+		try {
+			dateTime= interval>0?dateTime.plusYears(interval):dateTime.minusYears(Math.abs(interval));
+			dateTime= dateTime.withMonth(month).with(TemporalAdjusters.dayOfWeekInMonth(num, DayOfWeek.of(week)));
+		} catch (Exception e) {
+			logger.error("--间隔指定年数的指定月份指定周数指定星期数后日期异常!", e);
+		}
+		return dateTime;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取当前时间的星期数
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:31:06
+	 * 时间:2018年3月15日 下午4:31:06
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatWeek(Date date) {
 		String[] weeks = { "7", "1", "2", "3", "4", "5", "6" };
@@ -575,15 +1000,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取中英文星期数
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:32:32
+	 * 时间:2018年3月15日 下午4:32:32
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @param lang	语言(中文:zh/zh_CN,英文:en/en_US)
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatWeek(Date date, String lang) {
 		String[] weeks = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
@@ -598,15 +1023,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取中英文星期数
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:32:32
+	 * 时间:2018年3月15日 下午4:32:32
 	 * 参数：(参数列表)
 	 * @param week	指定星期
 	 * @param lang	语言(中文:zh/zh_CN,英文:en/en_US)
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatWeek(int week, String lang) {
 		String[] weeks = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
@@ -618,15 +1043,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期间隔分钟数(同一分钟间隔为0)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param from	起始时间
 	 * @param to	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalMinutes(String from, String to) {
 		try {
@@ -641,15 +1066,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期间隔分钟数(同一分钟间隔为0)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param startTime	起始时间
 	 * @param endTime	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalMinutes(Date startTime, Date endTime) {
 		try {
@@ -660,17 +1085,56 @@ public class DateUtils {
 		}
 		return 0;
 	}
-
 	/**
-	 * <pre>
+	 * 
+	 * 描述:获取日期间隔分钟数(同一分钟间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param startTime	起始时间
+	 * @param endTime	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalMinutes(LocalDateTime startTime, LocalDateTime endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toMinutes();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔分钟数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
+	 * 描述:获取日期间隔分钟数(同一分钟间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param startTime	起始时间
+	 * @param endTime	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalMinutes(LocalDate startTime, LocalDate endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toMinutes();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔分钟数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
 	 * 描述:获取日期间隔小时数(同一小时间隔为0)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param from	起始时间
 	 * @param to	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalHours(String from, String to) {
 		try {
@@ -685,15 +1149,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期间隔小时数(同一小时间隔为0)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param start	起始时间
 	 * @param end	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalHours(Date start, Date end) {
 		try {
@@ -704,17 +1168,57 @@ public class DateUtils {
 		}
 		return 0;
 	}
+	/**
+	 * 
+	 * 描述:获取日期间隔小时数(同一小时间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalHours(LocalDateTime startTime, LocalDateTime endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toHours();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔小时数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
+	 * 描述:获取日期间隔小时数(同一小时间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalHours(LocalDate startTime, LocalDate endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toHours();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔小时数失败!", e);
+		}
+		return 0;
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期间隔天数(同一天间隔为1)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param from	起始时间
 	 * @param to	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalDays(String from, String to) {
 		try {
@@ -729,15 +1233,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期间隔天数(同一天间隔为1)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param start	起始时间
 	 * @param end	结束时间
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static int intervalDays(Date start, Date end) {
 		try {
@@ -748,17 +1252,57 @@ public class DateUtils {
 		}
 		return 0;
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取日期间隔月数(同一月间隔为0)
+	 * 
+	 * 描述:获取日期间隔天数(同一天间隔为1)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:39:08
+	 * 时间:2018年3月15日 下午4:39:08
 	 * 参数：(参数列表)
 	 * @param start	起始时间
 	 * @param end	结束时间
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static long intervalDays(LocalDateTime startTime, LocalDateTime endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toDays();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔天数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
+	 * 描述:获取日期间隔天数(同一天间隔为1)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalDays(LocalDate startTime, LocalDate endTime) {
+		try {//Duration ==> day,hour,minute,second
+			Duration duration = Duration.between(startTime, startTime);
+			return duration.toDays();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔天数失败!", e);
+		}
+		return 0;
+	}
+
+	/**
+	 * 
+	 * 描述:获取日期间隔月数(同一月间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
 	 */
 	public static int intervalMonths(Date start, Date end) {
 		try {
@@ -769,95 +1313,279 @@ public class DateUtils {
 		}
 		return 0;
 	}
-
 	/**
-	 * <pre>
+	 * 
+	 * 描述:获取日期间隔月数(同一月间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalMonths(LocalDateTime startTime, LocalDateTime endTime) {
+		try {
+			Period period = Period.between(startTime.toLocalDate(),endTime.toLocalDate());
+			return period.toTotalMonths();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔月数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
+	 * 描述:获取日期间隔月数(同一月间隔为0)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:39:08
+	 * 参数：(参数列表)
+	 * @param start	起始时间
+	 * @param end	结束时间
+	 * @return
+	 * 
+	 */
+	public static long intervalMonths(LocalDate startTime, LocalDate endTime) {
+		try {
+			Period period = Period.between(startTime,endTime);
+			return period.toTotalMonths();
+		} catch (Exception e) {
+			logger.error("--获取日期间隔月数失败!", e);
+		}
+		return 0;
+	}
+	/**
+	 * 
 	 * 描述:获取日期的日数
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:42:19
+	 * 时间:2018年3月15日 下午4:42:19
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatDay(Date date) {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd");
 		String ctime = formatter.format(date);
 		return ctime;
 	}
-
 	/**
-	 * <pre>
+	 * 
+	 * 描述:获取日期的日数
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatDay(LocalDateTime dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
+		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
+	/**
+	 * 
+	 * 描述:获取日期的日数
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatDay(LocalDate dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
+		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
+	/**
+	 * 
 	 * 描述:获取日期的月数
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:42:19
+	 * 时间:2018年3月15日 下午4:42:19
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
 	 */
-	public static String formatMonth(Date date) {
+	public static String formatMonth(Date dateTime) {
 		SimpleDateFormat formatter = new SimpleDateFormat("MM");
-		String ctime = formatter.format(date);
+		String ctime = formatter.format(dateTime);
 		return ctime;
+	}
+	/**
+	 * 
+	 * 描述:获取日期的月数
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatMonth(LocalDateTime dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM");
+		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
+	/**
+	 * 
+	 * 描述:获取日期的月数
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatMonth(LocalDate dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM");
+		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
+		return zone.format(formatter);
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取日期的年
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:42:19
+	 * 时间:2018年3月15日 下午4:42:19
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
 	 */
-	public static String formatYear(Date date) {
+	public static String formatYear(Date dateTime) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy");
-		String ctime = formatter.format(date);
+		String ctime = formatter.format(dateTime);
 		return ctime;
+	}
+	/**
+	 * 
+	 * 描述:获取日期的年
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatYear(LocalDateTime dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
+	/**
+	 * 
+	 * 描述:获取日期的年
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:42:19
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static String formatYear(LocalDate date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+		ZonedDateTime zone = ZonedDateTime.of(date.atStartOfDay(), ZoneId.systemDefault());
+		return zone.format(formatter);
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:获取指定日期开始时间(格式:yyyy-MM-dd 00:00:00)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static Date formatFirstTime(Date date) {
 		String dateTime = formatDateStr(date) + " 00:00:00";
 		date = formatDateTime(dateTime);
 		return date;
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定日期最后时间(格式:yyyy-MM-dd 23:59:59)
+	 * 
+	 * 描述:获取指定日期开始时间(格式:yyyy-MM-dd 00:00:00)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatFirstTime(LocalDateTime dateTime) {
+		dateTime = dateTime.toLocalDate().atStartOfDay();
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定日期开始时间(格式:yyyy-MM-dd 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime formatFirstTime(LocalDate dateTime) {
+		return dateTime.atStartOfDay();
+	}
+
+	/**
+	 * 
+	 * 描述:获取指定日期最后时间(格式:yyyy-MM-dd 23:59:59)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatLastTime(Date date) {
 		String dateTime = formatDateStr(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定周的第一天(格式:yyyy-MM-dd 00:00:00)
+	 * 
+	 * 描述:获取指定日期最后时间(格式:yyyy-MM-dd 23:59:59)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatLastTime(LocalDateTime dateTime) {
+		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定日期最后时间(格式:yyyy-MM-dd 23:59:59)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDateTime formatLastTime(LocalDate date) {
+		LocalDateTime dateTime = LocalDateTime.of(date, LocalTime.MAX);
+		return dateTime;
+	}
+
+	
+	/**
+	 * 
+	 * 描述:获取指定周的第一天(格式:yyyy-MM-dd 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatWeekFirstTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
@@ -867,16 +1595,43 @@ public class DateUtils {
 		date = formatDateTime(dateTime);
 		return date;
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定周的最后一天(格式:yyyy-MM-dd 23:59:59)
+	 * 
+	 * 描述:获取指定周的第一天(格式:yyyy-MM-dd 00:00:00)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatWeekFirstTime(LocalDateTime dateTime) {
+		dateTime = dateTime.with(DayOfWeek.of(1));
+		return dateTime.toLocalDate().atStartOfDay();
+	}
+	/**
+	 * 
+	 * 描述:获取指定周的第一天(格式:yyyy-MM-dd)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatWeekFirstTime(LocalDate dateTime) {
+		dateTime = dateTime.with(DayOfWeek.of(1));
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定周的最后一天(格式:yyyy-MM-dd 23:59:59)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatWeekLastTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
@@ -885,16 +1640,45 @@ public class DateUtils {
 		String dateTime = formatDateStr(calendar.getTime()) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定月的第一天(格式:yyyy-MM-dd 00:00:00)
+	 * 
+	 * 描述:获取指定周的最后一天(格式:yyyy-MM-dd 23:59:59)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatWeekLastTime(LocalDateTime dateTime) {
+		dateTime = dateTime.with(DayOfWeek.of(7));
+		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定周的最后一天(格式:yyyy-MM-dd)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatWeekLastTime(LocalDate dateTime) {
+		dateTime = dateTime.with(DayOfWeek.of(7));
+		dateTime = LocalDateTime.of(dateTime, LocalTime.MAX).toLocalDate();
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定月的第一天(格式:yyyy-MM-dd 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatMonthFirstTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
@@ -904,16 +1688,45 @@ public class DateUtils {
 		date = formatDateTime(dateTime);
 		return date;
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定月的最后一天(格式:yyyy-MM-dd 23:59:59)
+	 * 
+	 * 描述:获取指定月的第一天(格式:yyyy-MM-dd 00:00:00)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatMonthFirstTime(LocalDateTime dateTime) {
+		dateTime = dateTime.withDayOfMonth(1);
+		dateTime = dateTime.toLocalDate().atStartOfDay();
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定月的第一天(格式:yyyy-MM-dd 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatMonthFirstTime(LocalDate dateTime) {
+		dateTime = dateTime.withDayOfMonth(1);
+		return dateTime;
+	}
+
+	/**
+	 * 
+	 * 描述:获取指定月的最后一天(格式:yyyy-MM-dd 23:59:59)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatMonthLastTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
@@ -924,46 +1737,133 @@ public class DateUtils {
 		String dateTime = formatDateStr(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定年的第一天(格式:yyyy-01-01 00:00:00)
+	 * 
+	 * 描述:获取指定月的最后一天(格式:yyyy-MM-dd 23:59:59)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatMonthLastTime(LocalDateTime dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.lastDayOfMonth());
+		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定月的最后一天(格式:yyyy-MM-dd)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatMonthLastTime(LocalDate dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.lastDayOfMonth());
+		return dateTime;
+	}
+
+	/**
+	 * 
+	 * 描述:获取指定年的第一天(格式:yyyy-01-01 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatYearFirstTime(Date date) {
 		String dateTime = formatYear(date) + "-01-01 00:00:00";
 		return formatDateTime(dateTime);
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取指定年的最后一天(格式:yyyy-12-31 23:59:59)
+	 * 
+	 * 描述:获取指定年的第一天(格式:yyyy-01-01 00:00:00)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:49:04
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatYearFirstTime(LocalDateTime dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.firstDayOfYear());
+		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定年的第一天(格式:yyyy-01-01 00:00:00)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatYearFirstTime(LocalDate dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.firstDayOfYear());
+		return dateTime;
+	}
+
+	/**
+	 * 
+	 * 描述:获取指定年的最后一天(格式:yyyy-12-31 23:59:59)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static Date formatYearLastTime(Date date) {
 		String dateTime = formatYear(date) + "-12-31 23:59:59";
 		return formatDateTime(dateTime);
 	}
-
 	/**
-	 * <pre>
-	 * 描述:获取中文日期字符串
+	 * 
+	 * 描述:获取指定年的最后一天(格式:yyyy-12-31 23:59:59)
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午4:50:26
+	 * 时间:2018年3月15日 下午4:49:04
 	 * 参数：(参数列表)
 	 * @param date	指定日期
 	 * @return
-	 * </pre>
+	 * 
+	 */
+	public static LocalDateTime formatYearLastTime(LocalDateTime dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.lastDayOfYear());
+		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
+		return dateTime;
+	}
+	/**
+	 * 
+	 * 描述:获取指定年的最后一天(格式:yyyy-12-31)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:49:04
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
+	 */
+	public static LocalDate formatYearLastTime(LocalDate dateTime) {
+		dateTime = dateTime.with(TemporalAdjusters.lastDayOfYear());
+		return dateTime;
+	}
+
+	/**
+	 * 
+	 * 描述:获取中文日期字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午4:50:26
+	 * 参数：(参数列表)
+	 * @param date	指定日期
+	 * @return
+	 * 
 	 */
 	public static String formatChinaDate(Date date) {
 		String format = "yyyy年MM月dd日";
@@ -971,15 +1871,15 @@ public class DateUtils {
 	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:[字符串型]日期转化指定UTF格式字符串
 	 * 作者:ZhangYi
-	 * 时间:2016年5月5日 下午3:25:25
+	 * 时间:2018年3月15日 下午3:25:25
 	 * 参数：(参数列表)
 	 * @param date		日期时间
 	 * @param format	日期格式(默认:yyyy-MM-dd'T'HH:mm:ss.SSSZ)
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatUTCDateTime(Date date, String format) {
 		if (StringUtils.isEmpty(format)) format = UTC_FORMAT_DATE_TIME;
@@ -990,18 +1890,52 @@ public class DateUtils {
 		calendar.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));// UTC时间算法
 		return formatDateTimeStr(calendar.getTime(), format);
 	}
+	/**
+	 * 
+	 * 描述:[字符串型]日期转化指定UTF格式字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午3:25:25
+	 * 参数：(参数列表)
+	 * @param date		日期时间
+	 * @param format	日期格式(默认:yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+	 * @return
+	 * 
+	 */
+	public static String formatUTCDateTime(LocalDateTime dateTime, String format) {
+		if (StringUtils.isEmpty(format)) format = UTC_FORMAT_DATE_TIME;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
+	/**
+	 * 
+	 * 描述:[字符串型]日期转化指定UTF格式字符串
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日 下午3:25:25
+	 * 参数：(参数列表)
+	 * @param date		日期时间
+	 * @param format	日期格式(默认:yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+	 * @return
+	 * 
+	 */
+	public static String formatUTCDateTime(LocalDate dateTime, String format) {
+		if (StringUtils.isEmpty(format)) format = UTC_FORMAT_DATE_TIME;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
+		return zone.format(formatter);
+	}
 
 	/**
-	 * <pre>
+	 * 
 	 * 描述:格式化合并日期时间(格式:yyyy-MM-dd ~ MM-dd 或 yyyy-MM-dd HH:mm ~ yyyy-MM-dd HH:mm)
 	 * 作者:ZhangYi
-	 * 时间:2016.10.24
+	 * 时间:2018年3月15日
 	 * 参数:参数列表
 	 * @param start 	开始时间
 	 * @param end 		结束时间
 	 * @param showTime 	显示方式(false:仅显示日期[格式:yyyy-MM-dd],true:显示时间[格式:yyyy-MM-dd HH:mm])
 	 * @return
-	 * </pre>
+	 * 
 	 */
 	public static String formatRangeDateTime(Date start, Date end, boolean showTime) {
 		String startTime = formatDateTimeStr(start, DEFAULT_FORMAT_DATE);
@@ -1024,18 +1958,112 @@ public class DateUtils {
 			return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_DATE_TIME);
 		}
 	}
-
-	public static String formatRangeDateStr(Date start, Date end) {
-		String rangeTime = formatDateTimeStr(start, "MM月dd日");
-		rangeTime += " " + formatDateTimeStr(start, "HH:mm");
-		rangeTime += "~" + formatDateTimeStr(end, "HH:mm");
+	/**
+	 * 
+	 * 描述:格式化合并日期时间(格式:yyyy-MM-dd ~ MM-dd 或 yyyy-MM-dd HH:mm ~ yyyy-MM-dd HH:mm)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日
+	 * 参数:参数列表
+	 * @param start 	开始时间
+	 * @param end 		结束时间
+	 * @param showTime 	显示方式(false:仅显示日期[格式:yyyy-MM-dd],true:显示时间[格式:yyyy-MM-dd HH:mm])
+	 * @return
+	 * 
+	 */
+	public static String formatRangeDateTime(LocalDateTime start, LocalDateTime end, boolean showTime) {
+		String startTime = formatDateTimeStr(start, DEFAULT_FORMAT_DATE);
+		String endTime = formatDateTimeStr(end, DEFAULT_FORMAT_DATE);
+		if (!showTime) {
+			if (formatYear(start) == formatYear(end)) {
+				if (startTime == endTime) {
+					return startTime;
+				}
+				return startTime + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE);
+			}
+			return startTime + " ~ " + endTime;
+		} else {
+			if (startTime == endTime) {
+				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+			}
+			if (formatYear(start) == formatYear(end)) {
+				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE_TIME);
+			}
+			return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_DATE_TIME);
+		}
+	}
+	/**
+	 * 
+	 * 描述:格式化合并日期时间(格式:yyyy-MM-dd ~ MM-dd 或 yyyy-MM-dd HH:mm ~ yyyy-MM-dd HH:mm)
+	 * 作者:ZhangYi
+	 * 时间:2018年3月15日
+	 * 参数:参数列表
+	 * @param start 	开始时间
+	 * @param end 		结束时间
+	 * @param showTime 	显示方式(false:仅显示日期[格式:yyyy-MM-dd],true:显示时间[格式:yyyy-MM-dd HH:mm])
+	 * @return
+	 * 
+	 */
+	public static String formatRangeDateTime(LocalDate start, LocalDate end, boolean showTime) {
+		String startTime = formatDateStr(start);
+		String endTime = formatDateStr(end);
+		if (!showTime) {
+			if (formatYear(start) == formatYear(end)) {
+				if (startTime == endTime) {
+					return startTime;
+				}
+				return startTime + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE);
+			}
+			return startTime + " ~ " + endTime;
+		} else {
+			if (startTime == endTime) {
+				return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_PATTERN_TIME);
+			}
+			if (formatYear(start) == formatYear(end)) {
+				return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_PATTERN_DATE_TIME);
+			}
+			return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_DATE_TIME);
+		}
+	}
+	/**
+	  * 描述: 合并日期(格式:MM-dd HH:mm~HH:mm)
+	  * 作者: ZhangYi
+	  * 时间: 2018年3月15日 下午1:31:58
+	  * 参数: (参数列表)
+	 * @param start 	开始时间
+	 * @param end 		结束时间
+	 * @return
+	 */
+	public static String formatRangeDateStrEng(Date start, Date end) {
+		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
 		return rangeTime;
 	}
-
-	public static String formatRangeDateStrEng(Date start, Date end) {
-		String rangeTime = formatDateTimeStr(start, "yyyy-MM-dd");
-		rangeTime += " " + formatDateTimeStr(start, "HH:mm");
-		rangeTime += "~" + formatDateTimeStr(end, "HH:mm");
+	/**
+	 * 描述: 合并日期(格式:MM-dd HH:mm~HH:mm)
+	 * 作者: ZhangYi
+	 * 时间: 2018年3月15日 下午1:31:58
+	 * 参数: (参数列表)
+	 * @param start 	开始时间
+	 * @param end 		结束时间
+	 * @return
+	 */
+	public static String formatRangeDateStrEng(LocalDateTime start, LocalDateTime end) {
+		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+		return rangeTime;
+	}
+	/**
+	 * 描述: 合并日期(格式:MM-dd HH:mm~HH:mm)
+	 * 作者: ZhangYi
+	 * 时间: 2018年3月15日 下午1:31:58
+	 * 参数: (参数列表)
+	 * @param start 	开始时间
+	 * @param end 		结束时间
+	 * @return
+	 */
+	public static String formatRangeDateStrEng(LocalDate start, LocalDate end) {
+		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
 		return rangeTime;
 	}
 
@@ -1076,6 +2104,18 @@ public class DateUtils {
 		Date start = formatDate("2016-11-01");
 		Date end = formatDate("2016-11-23");
 		System.out.println(intervalMonths(start, end));
+		System.out.println("========================================================================");
+		LocalDateTime now = LocalDateTime.now();
+		System.out.println(formatFirstTime(now));
+		System.out.println(formatLastTime(now));
+		System.out.println(formatWeekFirstTime(now));
+		System.out.println(formatWeekLastTime(now));
+		System.out.println(formatMonthFirstTime(now));
+		System.out.println(formatMonthLastTime(now));
+
+		LocalDate startTime = formatLocalDate("2016-11-01");
+		LocalDate endTime = formatLocalDate("2016-11-23");
+		System.out.println(intervalMonths(startTime, endTime));
 	}
 }
 
