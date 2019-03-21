@@ -1098,7 +1098,7 @@ public class DateUtils {
 	 */
 	public static long intervalMinutes(LocalDateTime startTime, LocalDateTime endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime, endTime);
 			return duration.toMinutes();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
@@ -1118,7 +1118,7 @@ public class DateUtils {
 	 */
 	public static long intervalMinutes(LocalDate startTime, LocalDate endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime.atStartOfDay(), endTime.atStartOfDay());
 			return duration.toMinutes();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
@@ -1181,7 +1181,7 @@ public class DateUtils {
 	 */
 	public static long intervalHours(LocalDateTime startTime, LocalDateTime endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime, endTime);
 			return duration.toHours();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
@@ -1201,7 +1201,7 @@ public class DateUtils {
 	 */
 	public static long intervalHours(LocalDate startTime, LocalDate endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime.atStartOfDay(), endTime.atStartOfDay());
 			return duration.toHours();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
@@ -1265,7 +1265,7 @@ public class DateUtils {
 	 */
 	public static long intervalDays(LocalDateTime startTime, LocalDateTime endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime, endTime);
 			return duration.toDays();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
@@ -1285,7 +1285,7 @@ public class DateUtils {
 	 */
 	public static long intervalDays(LocalDate startTime, LocalDate endTime) {
 		try {//Duration ==> day,hour,minute,second
-			Duration duration = Duration.between(startTime, startTime);
+			Duration duration = Duration.between(startTime.atStartOfDay(), endTime.atStartOfDay());
 			return duration.toDays();
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
@@ -2103,7 +2103,7 @@ public class DateUtils {
 
 		Date start = formatDate("2016-11-01");
 		Date end = formatDate("2016-11-23");
-		System.out.println(intervalMonths(start, end));
+		System.out.println(intervalDays(start, end));
 		System.out.println("========================================================================");
 		LocalDateTime now = LocalDateTime.now();
 		System.out.println(formatFirstTime(now));
@@ -2115,7 +2115,7 @@ public class DateUtils {
 
 		LocalDate startTime = formatLocalDate("2016-11-01");
 		LocalDate endTime = formatLocalDate("2016-11-23");
-		System.out.println(intervalMonths(startTime, endTime));
+		System.out.println(intervalDays(startTime, endTime));
 	}
 }
 
