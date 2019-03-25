@@ -159,7 +159,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateTimeStr(Date dateTime, String format) {
+	public static String formatDateTime(Date dateTime, String format) {
 		try {
 			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
 			SimpleDateFormat dateFormat = new SimpleDateFormat(format);
@@ -182,7 +182,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateTimeStr(LocalDateTime dateTime, String format) {
+	public static String formatDateTime(LocalDateTime dateTime, String format) {
 		try {
 			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -206,7 +206,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateTimeStr(LocalDate dateTime, String format) {
+	public static String formatDateTime(LocalDate dateTime, String format) {
 		try {
 			if (StringUtils.isEmpty(format)) format = DEFAULT_FORMAT_DATE_TIME;
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -285,18 +285,46 @@ public class DateUtils {
 		}
 	}
 	/**
-	  * 描述: Date转LocalDateTime
+	  * 描述: 毫秒转LocalDateTime
 	  * 作者: ZhangYi
 	  * 时间: 2019年3月21日 下午3:59:21
 	  * 参数: (参数列表)
-	  * @param date 转换日期
+	  * @param time 毫秒
 	  * @return
 	 */
-	public static LocalDateTime dateToDateTime(Date date) {
-		Instant instant = date.toInstant();
+	public static LocalDateTime dateToDateTime(long time) {
+		Instant instant = Instant.ofEpochMilli(time);
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
         return dateTime;
+	}
+	/**
+	 * 描述: 毫秒转LocalDate
+	 * 作者: ZhangYi
+	 * 时间: 2019年3月21日 下午3:59:21
+	 * 参数: (参数列表)
+	 * @param time 毫秒
+	 * @return
+	 */
+	public static LocalDate dateToLocalDate(long time) {
+		Instant instant = Instant.ofEpochMilli(time);
+		ZoneId zoneId = ZoneId.systemDefault();
+		LocalDate dateTime = instant.atZone(zoneId).toLocalDate();
+		return dateTime;
+	}
+	/**
+	 * 描述: Date转LocalDateTime
+	 * 作者: ZhangYi
+	 * 时间: 2019年3月21日 下午3:59:21
+	 * 参数: (参数列表)
+	 * @param date 转换日期
+	 * @return
+	 */
+	public static LocalDateTime dateToDateTime(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
+		return dateTime;
 	}
 	/**
 	 * 描述: Date转LocalDate
@@ -311,6 +339,19 @@ public class DateUtils {
 		ZoneId zoneId = ZoneId.systemDefault();
 		LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
 		return dateTime.toLocalDate();
+	}
+	/**
+	 * 描述: 毫秒转Date
+	 * 作者: ZhangYi
+	 * 时间: 2019年3月21日 下午3:59:21
+	 * 参数: (参数列表)
+	 * @param time 毫秒
+	 * @return
+	 */
+	public static Date dateTimeToDate(long time) {
+		Instant instant = Instant.ofEpochMilli(time);
+		Date dateTime = Date.from(instant);
+		return dateTime;
 	}
 	/**
 	  * 描述: LocalDateTime转Date
@@ -399,8 +440,8 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static Date formatDate(Date dateTime) {
-		String date = formatDateStr(dateTime);
+	public static Date formatToDate(Date dateTime) {
+		String date = formatDate(dateTime);
 		dateTime = formatDate(date);
 		return dateTime;
 	}
@@ -415,7 +456,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateTimeStr(Date dateTime) {
+	public static String formatDateTime(Date dateTime) {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE_TIME);
 			return sdf.format(dateTime);
@@ -434,7 +475,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateTimeStr(LocalDateTime dateTime) {
+	public static String formatDateTime(LocalDateTime dateTime) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
@@ -454,7 +495,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateHMTimeStr(Date dateTime) {
+	public static String formatDateHMTime(Date dateTime) {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME);
 			return sdf.format(dateTime);
@@ -473,7 +514,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateHMTimeStr(LocalDateTime dateTime) {
+	public static String formatDateHMTime(LocalDateTime dateTime) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_DATE_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
@@ -493,7 +534,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateStr(Date dateTime) {
+	public static String formatDate(Date dateTime) {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE);
 			return sdf.format(dateTime);
@@ -512,7 +553,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateStr(LocalDateTime dateTime) {
+	public static String formatDate(LocalDateTime dateTime) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
@@ -532,7 +573,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatDateStr(LocalDate dateTime) {
+	public static String formatDate(LocalDate dateTime) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
@@ -552,7 +593,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatTimeStr(Date dateTime) {
+	public static String formatTime(Date dateTime) {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_TIME);
 			return sdf.format(dateTime);
@@ -571,7 +612,7 @@ public class DateUtils {
 	 * @return
 	 * 
 	 */
-	public static String formatTimeStr(LocalDateTime dateTime) {
+	public static String formatTime(LocalDateTime dateTime) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
@@ -1501,7 +1542,7 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatFirstTime(Date date) {
-		String dateTime = formatDateStr(date) + " 00:00:00";
+		String dateTime = formatDate(date) + " 00:00:00";
 		date = formatDateTime(dateTime);
 		return date;
 	}
@@ -1544,7 +1585,7 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatLastTime(Date date) {
-		String dateTime = formatDateStr(date) + " 23:59:59";
+		String dateTime = formatDate(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
 	/**
@@ -1591,7 +1632,7 @@ public class DateUtils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_WEEK, 1);
-		String dateTime = formatDateStr(calendar.getTime()) + " 00:00:00";
+		String dateTime = formatDate(calendar.getTime()) + " 00:00:00";
 		date = formatDateTime(dateTime);
 		return date;
 	}
@@ -1637,7 +1678,7 @@ public class DateUtils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_WEEK, 7);
-		String dateTime = formatDateStr(calendar.getTime()) + " 23:59:59";
+		String dateTime = formatDate(calendar.getTime()) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
 	/**
@@ -1684,7 +1725,7 @@ public class DateUtils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
-		String dateTime = formatDateStr(calendar.getTime()) + " 00:00:00";
+		String dateTime = formatDate(calendar.getTime()) + " 00:00:00";
 		date = formatDateTime(dateTime);
 		return date;
 	}
@@ -1734,7 +1775,7 @@ public class DateUtils {
 		calendar.add(Calendar.MONTH, 1);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		date.setTime(calendar.getTimeInMillis() - 1 * 24 * 60 * 60 * 1000l);
-		String dateTime = formatDateStr(date) + " 23:59:59";
+		String dateTime = formatDate(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
 	/**
@@ -1867,7 +1908,7 @@ public class DateUtils {
 	 */
 	public static String formatChinaDate(Date date) {
 		String format = "yyyy年MM月dd日";
-		return formatDateTimeStr(date, format);
+		return formatDateTime(date, format);
 	}
 
 	/**
@@ -1888,7 +1929,7 @@ public class DateUtils {
 		int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);// 时间偏移量
 		int dstOffset = calendar.get(Calendar.DST_OFFSET);// 夏令时差
 		calendar.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));// UTC时间算法
-		return formatDateTimeStr(calendar.getTime(), format);
+		return formatDateTime(calendar.getTime(), format);
 	}
 	/**
 	 * 
@@ -1938,24 +1979,24 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatRangeDateTime(Date start, Date end, boolean showTime) {
-		String startTime = formatDateTimeStr(start, DEFAULT_FORMAT_DATE);
-		String endTime = formatDateTimeStr(end, DEFAULT_FORMAT_DATE);
+		String startTime = formatDateTime(start, DEFAULT_FORMAT_DATE);
+		String endTime = formatDateTime(end, DEFAULT_FORMAT_DATE);
 		if (!showTime) {
 			if (formatYear(start) == formatYear(end)) {
 				if (startTime == endTime) {
 					return startTime;
 				}
-				return startTime + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE);
+				return startTime + " ~ " + formatDateTime(end, FORMAT_PATTERN_DATE);
 			}
 			return startTime + " ~ " + endTime;
 		} else {
 			if (startTime == endTime) {
-				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+				return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_PATTERN_TIME);
 			}
 			if (formatYear(start) == formatYear(end)) {
-				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE_TIME);
+				return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_PATTERN_DATE_TIME);
 			}
-			return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_DATE_TIME);
+			return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_DATE_TIME);
 		}
 	}
 	/**
@@ -1971,24 +2012,24 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatRangeDateTime(LocalDateTime start, LocalDateTime end, boolean showTime) {
-		String startTime = formatDateTimeStr(start, DEFAULT_FORMAT_DATE);
-		String endTime = formatDateTimeStr(end, DEFAULT_FORMAT_DATE);
+		String startTime = formatDateTime(start, DEFAULT_FORMAT_DATE);
+		String endTime = formatDateTime(end, DEFAULT_FORMAT_DATE);
 		if (!showTime) {
 			if (formatYear(start) == formatYear(end)) {
 				if (startTime == endTime) {
 					return startTime;
 				}
-				return startTime + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE);
+				return startTime + " ~ " + formatDateTime(end, FORMAT_PATTERN_DATE);
 			}
 			return startTime + " ~ " + endTime;
 		} else {
 			if (startTime == endTime) {
-				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+				return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_PATTERN_TIME);
 			}
 			if (formatYear(start) == formatYear(end)) {
-				return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE_TIME);
+				return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_PATTERN_DATE_TIME);
 			}
-			return formatDateTimeStr(start, FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(end, FORMAT_DATE_TIME);
+			return formatDateTime(start, FORMAT_DATE_TIME) + " ~ " + formatDateTime(end, FORMAT_DATE_TIME);
 		}
 	}
 	/**
@@ -2004,24 +2045,24 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatRangeDateTime(LocalDate start, LocalDate end, boolean showTime) {
-		String startTime = formatDateStr(start);
-		String endTime = formatDateStr(end);
+		String startTime = formatDate(start);
+		String endTime = formatDate(end);
 		if (!showTime) {
 			if (formatYear(start) == formatYear(end)) {
 				if (startTime == endTime) {
 					return startTime;
 				}
-				return startTime + " ~ " + formatDateTimeStr(end, FORMAT_PATTERN_DATE);
+				return startTime + " ~ " + formatDateTime(end, FORMAT_PATTERN_DATE);
 			}
 			return startTime + " ~ " + endTime;
 		} else {
 			if (startTime == endTime) {
-				return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_PATTERN_TIME);
+				return formatDateTime(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTime(formatLastTime(end), FORMAT_PATTERN_TIME);
 			}
 			if (formatYear(start) == formatYear(end)) {
-				return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_PATTERN_DATE_TIME);
+				return formatDateTime(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTime(formatLastTime(end), FORMAT_PATTERN_DATE_TIME);
 			}
-			return formatDateTimeStr(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTimeStr(formatLastTime(end), FORMAT_DATE_TIME);
+			return formatDateTime(formatFirstTime(start), FORMAT_DATE_TIME) + " ~ " + formatDateTime(formatLastTime(end), FORMAT_DATE_TIME);
 		}
 	}
 	/**
@@ -2033,9 +2074,9 @@ public class DateUtils {
 	 * @param end 		结束时间
 	 * @return
 	 */
-	public static String formatRangeDateStrEng(Date start, Date end) {
-		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+	public static String formatRangeDateEng(Date start, Date end) {
+		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
 		return rangeTime;
 	}
 	/**
@@ -2047,9 +2088,9 @@ public class DateUtils {
 	 * @param end 		结束时间
 	 * @return
 	 */
-	public static String formatRangeDateStrEng(LocalDateTime start, LocalDateTime end) {
-		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+	public static String formatRangeDateEng(LocalDateTime start, LocalDateTime end) {
+		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
 		return rangeTime;
 	}
 	/**
@@ -2061,9 +2102,9 @@ public class DateUtils {
 	 * @param end 		结束时间
 	 * @return
 	 */
-	public static String formatRangeDateStrEng(LocalDate start, LocalDate end) {
-		String rangeTime = formatDateTimeStr(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTimeStr(end, FORMAT_PATTERN_TIME);
+	public static String formatRangeDateEng(LocalDate start, LocalDate end) {
+		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
+		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
 		return rangeTime;
 	}
 
@@ -2077,11 +2118,11 @@ public class DateUtils {
 		// System.out.println(DateUtil.formatDateTime(time));
 		// System.out.println(DateUtil.getDate("2016-05-01"));
 		// System.out.println(DateUtil.getChinaDateYMD(new Date()));
-		// System.out.println(DateUtil.formatDateTimeStr(getLastTime(new Date())));
+		// System.out.println(DateUtil.formatDateTime(getLastTime(new Date())));
 		// Calendar calender1 = Calendar.getInstance();
 		// calender1.setTime(new Date());
 		// calender1.add(Calendar.DATE, 30);
-		// String dateTime1 = formatDateTimeStr(calender1.getTime());
+		// String dateTime1 = formatDateTime(calender1.getTime());
 		// System.out.println(dateTime1);
 		// GregorianCalendar calendar = new GregorianCalendar();
 		// calendar.setTime(new Date());
@@ -2091,9 +2132,13 @@ public class DateUtils {
 		String CHINA_FORMAT_DATE_TIME =
 				"G yyyy年MM月dd日 a HH时mm分ss秒SSS毫秒 zZ(本年第w周,本月第W周,本年第D天,本月第F星期的E)";
 		String dateTime =
-				formatDateTimeStr(formatDateTime("2016-07-31 13:26:50"), CHINA_FORMAT_DATE_TIME);
+				formatDateTime(formatDateTime("2016-07-31 13:26:50"), CHINA_FORMAT_DATE_TIME);
 		System.out.println(dateTime);
 		Date today = new Date();
+		System.out.println(dateTimeToDate(today.getTime()));
+		System.out.println(dateToLocalDate(today.getTime()));
+		System.out.println(dateToDateTime(today.getTime()));
+		System.out.println("===================================================================");
 		System.out.println(formatFirstTime(today));
 		System.out.println(formatLastTime(today));
 		System.out.println(formatWeekFirstTime(today));
