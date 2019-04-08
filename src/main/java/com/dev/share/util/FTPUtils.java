@@ -12,6 +12,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
+  * 项目: SF_Common
   * 描述: FTP文件下载功能
   * 作者: zhangyi183790
   * 时间: 2019年3月19日 上午10:35:50
@@ -20,6 +21,10 @@ import org.slf4j.LoggerFactory;
  */
 public class FTPUtils {
 	private static Logger logger = LoggerFactory.getLogger(FTPUtils.class);
+	/**
+	 * FTP协议:ftp://
+	 */
+	public final static String PROTOCOL_FTP="ftp://";
 	private static FTPClient client = null;
 	/**
 	  * 描述: FTP打开连接
@@ -155,6 +160,7 @@ public class FTPUtils {
             }  
         }
     }
+	public static final Pattern pattern = Pattern.compile("[^\\x00-\\xff]");
 	/**
 	  * 描述: 匹配双字节字符（汉字、中文标点符号等）
 	  * 作者: ZhangYi
@@ -170,6 +176,7 @@ public class FTPUtils {
 //		匹配汉字文字： [\u4e00-\u9fa5]或[\u2E80-\u9FFF]
 //		匹配非汉字字符： [^\u4e00-\u9fa5]
 //		匹配双字节字符（汉字、中文标点符号等）： [^\x00-\xff]
-		return Pattern.compile("[^\\x00-\\xff]").matcher(target).find();
+		
+		return pattern.matcher(target).find();
 	}
 }

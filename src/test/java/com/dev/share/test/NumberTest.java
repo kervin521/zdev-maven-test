@@ -7,16 +7,16 @@ public class NumberTest {
 //		if(++i>0) {
 //			System.out.println("---------------"+i);
 //		}
-		int f = 0xffff;
-		for(int i=0;i<10;i++) {
-			int n = (i & f)+1;
-			System.out.println("f:"+f+"\ti:"+i+"\tn:"+n+"\t>:"+String.format("%05d", n));
-			if(i==9) {
-				i = 65536;
-				n = (i & f)+1;
-				System.out.println("f:"+f+"\ti:"+i+"\tn:"+n+"\t>:"+String.format("%05d", n));
-			}
-		}
+//		int f = 0xffff;
+//		for(int i=0;i<10;i++) {
+//			int n = (i & f)+1;
+//			System.out.println("f:"+f+"\ti:"+i+"\tn:"+n+"\t>:"+String.format("%05d", n));
+//			if(i==9) {
+//				i = 65536;
+//				n = (i & f)+1;
+//				System.out.println("f:"+f+"\ti:"+i+"\tn:"+n+"\t>:"+String.format("%05d", n));
+//			}
+//		}
 		
 		
 //		‭    1111111111111111‬
@@ -29,5 +29,8 @@ public class NumberTest {
 //		System.out.println(2%1);
 //		System.out.println(Integer.MAX_VALUE);;
 		System.out.println("===============================================================================");
+		for(int i=1;i<=12;i++) {
+		    System.out.println(i+"----"+Double.valueOf((i-1)/3+1).intValue());
+		}
 	}
 }
