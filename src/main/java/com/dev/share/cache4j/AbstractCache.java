@@ -14,24 +14,25 @@ import net.sf.cache4j.CacheException;
 import net.sf.cache4j.impl.CacheConfigImpl;
 
 /***
-  * 项目:emgw-core
-  * 描述: 二级缓存
-  * 	缓存配置参数：
-  * 		cacheId 缓存ID
-  * 		cacheDesc 描述
-  * 		ttl 对象在缓存中的最大生存期，0 - 没有限制
-  * 		idleTime 对象的非活动状态中的高速缓存（空闲时间）的最大时间。0 - 没有限制
-  * 		maxMemorySize 最大内存大小
-  * 		maxSize 在高速缓存的对象的最大数量。
-  * 		type 缓存类型。可能的值有：blocking（闭塞） synchronized（同步） nocache（非缓存）
-  * 		algorithm 该算法是从缓存中移除对象。可能的值有：LRU（最近最少使用）LFU（最常用）FIFO（先入先出）
-  * 		reference 包含在高速缓存对象的引用的类型。可能的值有：strong soft
-  * 作者:ZhangYi
-  * 时间:2019年1月3日 下午2:52:08
-  * 版本:v1.0
-  * JDK:1.8.192
-  * @company 空间畅想
-  */
+ * 项目:emgw-core
+ * 描述: 二级缓存
+ * 缓存配置参数：
+ * cacheId 缓存ID
+ * cacheDesc 描述
+ * ttl 对象在缓存中的最大生存期，0 - 没有限制
+ * idleTime 对象的非活动状态中的高速缓存（空闲时间）的最大时间。0 - 没有限制
+ * maxMemorySize 最大内存大小
+ * maxSize 在高速缓存的对象的最大数量。
+ * type 缓存类型。可能的值有：blocking（闭塞） synchronized（同步） nocache（非缓存）
+ * algorithm 该算法是从缓存中移除对象。可能的值有：LRU（最近最少使用）LFU（最常用）FIFO（先入先出）
+ * reference 包含在高速缓存对象的引用的类型。可能的值有：strong soft
+ * 作者:ZhangYi
+ * 时间:2019年1月3日 下午2:52:08
+ * 版本:v1.0
+ * JDK:1.8.192
+ * 
+ * @company 空间畅想
+ */
 public abstract class AbstractCache implements Serializable {
 	private static final long serialVersionUID = -1942967698533266300L;
 	private static final Logger logger = LoggerFactory.getLogger(AbstractCache.class);
@@ -68,13 +69,14 @@ public abstract class AbstractCache implements Serializable {
 			try {
 				cache = cache(config);
 			} catch (CacheException e) {
-				logger.error("--初始化JVM二级缓存失败!",e);
+				logger.error("--初始化JVM二级缓存失败!", e);
 			}
 		}
 		if (cache == null) {
 			throw new IllegalArgumentException("cacheImpl constructor error~");
 		}
 	}
+
 	/**
 	 * 缓存配置参数
 	 * cacheId 缓存ID
@@ -88,45 +90,46 @@ public abstract class AbstractCache implements Serializable {
 	 * reference 包含在高速缓存对象的引用的类型。可能的值有：strong soft
 	 */
 	private CacheConfig getConfig(RCacheConfig config) {
-		if(config.getTtl()>0) {
-			this.ttl = config.getTtl() * 1000/2;
+		if (config.getTtl() > 0) {
+			this.ttl = config.getTtl() * 1000 / 2;
 		}
-		if(config.getMaxIdleTime()>0) {
-			this.idleTime = config.getMaxIdleTime() * 1000/2;
+		if (config.getMaxIdleTime() > 0) {
+			this.idleTime = config.getMaxIdleTime() * 1000 / 2;
 		}
-		if(reference == null) {
+		if (reference == null) {
 			reference = "strong";
 		}
-		if(algorithm == null) {
+		if (algorithm == null) {
 			algorithm = "LRU";
 		}
-		if(name == null) {
-			name = getCacheType()+"_cacheId";
+		if (name == null) {
+			name = getCacheType() + "_cacheId";
 		}
-		if(maxMemorySize <= 0) {
+		if (maxMemorySize <= 0) {
 			maxMemorySize = 1024 * 1024 * 1024;
 		}
-		if(maxSize <= 0) {
+		if (maxSize <= 0) {
 			maxSize = 10000;
 		}
-		CacheConfig conf =  new CacheConfigImpl(name, null, ttl, idleTime, maxMemorySize, maxSize, null, algorithm, reference);
+		CacheConfig conf = new CacheConfigImpl(name, null, ttl, idleTime, maxMemorySize, maxSize, null, algorithm, reference);
 		return conf;
 	}
-	
+
 	private Cache cache(RCacheConfig config) throws CacheException {
 		CacheConfig conf = getConfig(config);
 		Cache cache = getCache(conf);
 		return cache;
 	}
-	
+
 	public abstract Cache getCache(CacheConfig conf) throws CacheException;
+
 	public abstract String getCacheType();
-	
+
 	public void replace(Object objId, Object obj) {
 		try {
 			cache.put(objId, obj);
 		} catch (CacheException e) {
-			logger.error("--["+getCacheType()+"]cache("+name+") replace error!",e);
+			logger.error("--[" + getCacheType() + "]cache(" + name + ") replace error!", e);
 		}
 	}
 
@@ -134,35 +137,35 @@ public abstract class AbstractCache implements Serializable {
 		try {
 			cache.put(objId, obj);
 		} catch (CacheException e) {
-			logger.error("--["+getCacheType()+"]cache("+name+") put error!",e);
+			logger.error("--[" + getCacheType() + "]cache(" + name + ") put error!", e);
 		}
 	}
 
 	public Object get(Object objId) {
 		try {
-			String info=cache.getCacheInfo().toString();
-			System.out.println("--------{name:"+name+",ttl:"+StringUtils.time(0, ttl)+",idleTime:"+StringUtils.time(0, idleTime)+",reference:"+reference+",algorithm:"+algorithm+",maxMemorySize:"+StringUtils.capacity(maxMemorySize, false)+",maxSize:"+maxSize+",info:["+info+"]}-------------------------------------");
+			String info = cache.getCacheInfo().toString();
+			System.out.println("--------{name:" + name + ",ttl:" + StringUtils.time(0, ttl) + ",idleTime:" + StringUtils.time(0, idleTime) + ",reference:" + reference + ",algorithm:" + algorithm + ",maxMemorySize:" + StringUtils.capacity(maxMemorySize, false) + ",maxSize:" + maxSize + ",info:[" + info + "]}-------------------------------------");
 			Object obj = cache.get(objId);
 			if (obj != null) {
-				if("none".equals(obj.toString())){
+				if ("none".equals(obj.toString())) {
 					return null;
 				}
 				return obj;
-			}else {
+			} else {
 				cache.put(objId, "none");
 			}
 			return obj;
 		} catch (CacheException e) {
-			logger.error("--["+getCacheType()+"]cache("+name+") get error!",e);
+			logger.error("--[" + getCacheType() + "]cache(" + name + ") get error!", e);
 		}
 		return null;
 	}
-	
+
 	public void putInLocal(Object objId, Object obj) {
 		try {
 			cache.put(objId, obj);
 		} catch (CacheException e) {
-			logger.error("--["+getCacheType()+"]cache("+name+") putInLocal error!",e);
+			logger.error("--[" + getCacheType() + "]cache(" + name + ") putInLocal error!", e);
 		}
 	}
 
@@ -170,11 +173,11 @@ public abstract class AbstractCache implements Serializable {
 		try {
 			return cache.get(objId);
 		} catch (CacheException e) {
-			logger.error("--["+getCacheType()+"]cache("+name+") getInLocal error!",e);
+			logger.error("--[" + getCacheType() + "]cache(" + name + ") getInLocal error!", e);
 		}
 		return null;
 	}
-	
+
 	public void setName(String name) {
 
 		this.name = name;
@@ -191,12 +194,15 @@ public abstract class AbstractCache implements Serializable {
 	public void setMaxMemorySize(long maxMemorySize) {
 		this.maxMemorySize = maxMemorySize;
 	}
+
 	public void setTtl(long ttl) {
 		this.ttl = ttl;
 	}
+
 	public void setIdleTime(long idleTime) {
 		this.idleTime = idleTime;
 	}
+
 	public void setReference(String reference) {
 		this.reference = reference;
 	}

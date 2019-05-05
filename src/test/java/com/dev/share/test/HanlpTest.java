@@ -17,82 +17,79 @@ import com.hankcs.hanlp.seg.Segment;
 import com.hankcs.hanlp.seg.common.Term;
 
 public class HanlpTest {
-	 //阈值,用于决定语言分析和语序分析占相似度的百分比，此处0.2为语已占比
-    public static double YUZHI = 0.2 ;
-    public static Vector<String> participle( String str ) 
-    {
-        
-        Vector<String> str1 = new Vector<String>() ;//对输入进行分词
-        Segment segment=HanLP.newSegment().enableCustomDictionary(true);
-        CustomDictionary.add("梁山广");//动态添加自定义词汇
-        List<Term> termList=segment.seg(str);
-        for(Term term:termList)
-        {
+	// 阈值,用于决定语言分析和语序分析占相似度的百分比，此处0.2为语已占比
+	public static double YUZHI = 0.2;
+
+	public static Vector<String> participle(String str) {
+
+		Vector<String> str1 = new Vector<String>();// 对输入进行分词
+		Segment segment = HanLP.newSegment().enableCustomDictionary(true);
+		CustomDictionary.add("梁山广");// 动态添加自定义词汇
+		List<Term> termList = segment.seg(str);
+		for (Term term : termList) {
 //                System.out.println(term.toString());
-            str1.add(term.toString());
-        }        
-        
-        if( str1.size() == 0 ) 
-        {
-            return null ;
-        }
-        
-        //分词后
-        System.out.println( "str分词后：" + str1 );
-        return str1;
-    }
-    
-    public static double getSimilarity(Vector<String> T1, Vector<String> T2) throws Exception 
-    {
-        int size = 0 , size2 = 0 ;
-        if ( T1 != null && ( size = T1.size() ) > 0 && T2 != null && ( size2 = T2.size() ) > 0 ) {
-            
-            Map<String, double[]> T = new HashMap<String, double[]>();
-            
-            //T1和T2的并集T
-            String index = null ;
-            for ( int i = 0 ; i < size ; i++ ) {
-                index = T1.get(i) ;
-                if( index != null){
-                    double[] c = T.get(index);
-                    c = new double[2];
-                    c[0] = 1;    //T1的语义分数Ci
-                    c[1] = YUZHI;//T2的语义分数Ci
-                    T.put( index, c );
-                }
-            }
-     
-            for ( int i = 0; i < size2 ; i++ ) {
-                index = T2.get(i) ;
-                if( index != null ){
-                    double[] c = T.get( index );
-                    if( c != null && c.length == 2 ){
-                        c[1] = 1; //T2中也存在，T2的语义分数=1
-                    }else {
-                        c = new double[2];
-                        c[0] = YUZHI; //T1的语义分数Ci
-                        c[1] = 1; //T2的语义分数Ci
-                        T.put( index , c );
-                    }
-                }
-            }
-                
-            //开始计算，百分比
-            Iterator<String> it = T.keySet().iterator();
-            double s1 = 0 , s2 = 0, Ssum = 0;  //S1、S2
-            while( it.hasNext() ){
-                double[] c = T.get( it.next() );
-                Ssum += c[0]*c[1];
-                s1 += c[0]*c[0];
-                s2 += c[1]*c[1];
-            }
-            //百分比
-            return Ssum / Math.sqrt( s1*s2 );
-        } else {
-            throw new Exception("传入参数有问题！");
-        }
-    }
-    
+			str1.add(term.toString());
+		}
+
+		if (str1.size() == 0) {
+			return null;
+		}
+
+		// 分词后
+		System.out.println("str分词后：" + str1);
+		return str1;
+	}
+
+	public static double getSimilarity(Vector<String> T1, Vector<String> T2) throws Exception {
+		int size = 0, size2 = 0;
+		if (T1 != null && (size = T1.size()) > 0 && T2 != null && (size2 = T2.size()) > 0) {
+
+			Map<String, double[]> T = new HashMap<String, double[]>();
+
+			// T1和T2的并集T
+			String index = null;
+			for (int i = 0; i < size; i++) {
+				index = T1.get(i);
+				if (index != null) {
+					double[] c = T.get(index);
+					c = new double[2];
+					c[0] = 1; // T1的语义分数Ci
+					c[1] = YUZHI;// T2的语义分数Ci
+					T.put(index, c);
+				}
+			}
+
+			for (int i = 0; i < size2; i++) {
+				index = T2.get(i);
+				if (index != null) {
+					double[] c = T.get(index);
+					if (c != null && c.length == 2) {
+						c[1] = 1; // T2中也存在，T2的语义分数=1
+					} else {
+						c = new double[2];
+						c[0] = YUZHI; // T1的语义分数Ci
+						c[1] = 1; // T2的语义分数Ci
+						T.put(index, c);
+					}
+				}
+			}
+
+			// 开始计算，百分比
+			Iterator<String> it = T.keySet().iterator();
+			double s1 = 0, s2 = 0, Ssum = 0; // S1、S2
+			while (it.hasNext()) {
+				double[] c = T.get(it.next());
+				Ssum += c[0] * c[1];
+				s1 += c[0] * c[0];
+				s2 += c[1] * c[1];
+			}
+			// 百分比
+			return Ssum / Math.sqrt(s1 * s2);
+		} else {
+			throw new Exception("传入参数有问题！");
+		}
+	}
+
 	public static void main(String[] args) {
 
 //		System.out.println(HanLP.segment("你好，欢迎使用HanLP汉语处理包！"));
@@ -225,8 +222,8 @@ public class HanlpTest {
 //            System.out.println("相似度 计算失败，失败原因如下：");
 //            e.printStackTrace();
 //        }
-		double similarity = HanlpSimilarty.getInstance().similarity(ctn1,ctn2);
-		System.out.println("两个句子的相似度为:"+similarity);
+		double similarity = HanlpSimilarty.getInstance().similarity(ctn1, ctn2);
+		System.out.println("两个句子的相似度为:" + similarity);
 //      double distance = CoreSynonymDictionary.distance(ctn1, ctn2);
 //      double similarity2 = CoreSynonymDictionary.similarity(ctn1, ctn2);
 //      System.out.println("两个句子的相似度为:"+similarity+",相似距离:"+distance+",相似度:"+similarity2);

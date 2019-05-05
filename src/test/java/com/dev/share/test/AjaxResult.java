@@ -13,33 +13,33 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author wuxiaowei
  */
 public class AjaxResult {
-	public static final int		AJAX_STATUS_SUCCESS		= 0;
-	public static final int		AJAX_STATUS_ERROR		= -1;
-	public static final String	AJAX_MESSAGE_SUCCESS	= "success";
-	public static AjaxResult	ERROR					= new AjaxResult(AJAX_STATUS_ERROR);
-	public static AjaxResult	SUCCESS					= new AjaxResult(AJAX_STATUS_SUCCESS);
-	public static PAjaxResult	PSUCCESS				= new PAjaxResult(AJAX_STATUS_SUCCESS);
+	public static final int AJAX_STATUS_SUCCESS = 0;
+	public static final int AJAX_STATUS_ERROR = -1;
+	public static final String AJAX_MESSAGE_SUCCESS = "success";
+	public static AjaxResult ERROR = new AjaxResult(AJAX_STATUS_ERROR);
+	public static AjaxResult SUCCESS = new AjaxResult(AJAX_STATUS_SUCCESS);
+	public static PAjaxResult PSUCCESS = new PAjaxResult(AJAX_STATUS_SUCCESS);
 	/**
 	 * 返回的中文消息
 	 */
-	private String				message;
+	private String message;
 	/**
 	 * 成功时携带的数据
 	 */
-	private Object				results;
+	private Object results;
 	/**
 	 * 返回状态码
 	 */
-	private int					statuscode;
+	private int statuscode;
 
-	public AjaxResult(){
+	public AjaxResult() {
 	}
 
-	public AjaxResult(int statuscode){
+	public AjaxResult(int statuscode) {
 		this.statuscode = statuscode;
 	}
 
-	public AjaxResult(String message){
+	public AjaxResult(String message) {
 		this.message = message;
 	}
 
@@ -104,27 +104,28 @@ public class AjaxResult {
 	}
 
 	/**
-	  * 项目: SF_Common
-	  * 描述: ajax响应重构
-	  * @author ZhangYi
-	  * 时间: 2019年3月13日 下午3:22:41
-	  * 版本: v1.0
-	  * JDK: 1.8
+	 * 项目: SF_Common
+	 * 描述: ajax响应重构
+	 * 
+	 * @author ZhangYi
+	 *         时间: 2019年3月13日 下午3:22:41
+	 *         版本: v1.0
+	 *         JDK: 1.8
 	 */
 	public static class PAjaxResult extends AjaxResult {
-		private int		pageNum;
-		private int		pageSize;
-		private long	total;
+		private int pageNum;
+		private int pageSize;
+		private long total;
 
-		public PAjaxResult(){
+		public PAjaxResult() {
 			super(AJAX_STATUS_SUCCESS);
 		}
 
-		public PAjaxResult(int status){
+		public PAjaxResult(int status) {
 			super(status);
 		}
 
-		public PAjaxResult(int pageNum, int pageSize, long total, Object results){
+		public PAjaxResult(int pageNum, int pageSize, long total, Object results) {
 			this();
 			this.pageNum = pageNum;
 			this.pageSize = pageSize;
@@ -159,12 +160,12 @@ public class AjaxResult {
 			return this;
 		}
 	}
-	
+
 	public static void main(String[] args) throws InterruptedException {
 		ConcurrentLinkedQueue<AjaxResult> queue = new ConcurrentLinkedQueue<AjaxResult>();
 		CountDownLatch latch = new CountDownLatch(200);
 		ScheduledExecutorService schedule = Executors.newScheduledThreadPool(4);
-		for (int i=0;i<200;i++) {
+		for (int i = 0; i < 200; i++) {
 			schedule.execute(new Runnable() {
 				@Override
 				public void run() {
@@ -175,10 +176,10 @@ public class AjaxResult {
 		}
 		latch.await();
 		ConcurrentHashMap<Integer, String> map = new ConcurrentHashMap<Integer, String>();
-		System.out.println("=============="+queue.size());
-		queue.stream().forEach(obj->{
+		System.out.println("==============" + queue.size());
+		queue.stream().forEach(obj -> {
 			map.put(obj.hashCode(), obj.toString());
 		});
-		System.out.println("------------------"+map.size());
+		System.out.println("------------------" + map.size());
 	}
 }

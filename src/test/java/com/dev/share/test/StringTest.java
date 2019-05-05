@@ -15,7 +15,7 @@ import com.dev.share.util.StringUtils;
 public class StringTest {
 
 	public static void test() {
-		while(true) {
+		while (true) {
 			long start = System.currentTimeMillis();
 			try {
 				Thread.sleep(1000);
@@ -24,9 +24,10 @@ public class StringTest {
 				e.printStackTrace();
 			}
 			long endTime = System.currentTimeMillis();
-			System.out.println("-------------------------------------------------切换通道服务[end]------------------------------------------------"+StringUtils.time(start, endTime));
+			System.out.println("-------------------------------------------------切换通道服务[end]------------------------------------------------" + StringUtils.time(start, endTime));
 		}
 	}
+
 	public static void main(String[] args) throws IOException {
 //		String a = "abc";
 //		String b = "abc";
@@ -66,7 +67,7 @@ public class StringTest {
 //	    String source = StringUtils.unGzip(data);
 //	    long end = System.currentTimeMillis();
 //	    System.out.println("------------------------------------{use:"+StringUtils.time(delay, end)+",result:"+source.length());
-		
+
 //		for(int i=0;i<20;i++) {
 //			System.out.println(String.format("%02d", 5));
 //		}

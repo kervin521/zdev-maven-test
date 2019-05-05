@@ -11,21 +11,22 @@ import com.dev.share.metrics.MetricsHandler;
 public class KafkaConsumerService extends AbstractKafkaConsumerService<Object> {
 	private static Logger logger = LoggerFactory.getLogger(KafkaConsumerService.class);
 	public static Meter meter = MetricsHandler.meter("Kafka-Consumer");
+
 	@Override
 	public boolean handle(Object obj) {
 		System.out.println("\n\n=================================================================================");
 		boolean flag = true;
 		try {
 			String value = null;
-			if(obj instanceof String) {
+			if (obj instanceof String) {
 				value = (String) obj;
-			}else {
+			} else {
 				value = JSON.toJSONString(obj);
 			}
 			meter.mark();
-			System.out.println("[Kafka-consumer]"+value);
-		}catch (Exception e) {
-			logger.error("--[Kafka-consumer]Data io error ! ",e);
+			System.out.println("[Kafka-consumer]" + value);
+		} catch (Exception e) {
+			logger.error("--[Kafka-consumer]Data io error ! ", e);
 			flag = false;
 		}
 		System.out.println("=================================================================================\\n\\n");

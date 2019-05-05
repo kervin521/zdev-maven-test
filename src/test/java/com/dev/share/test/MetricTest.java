@@ -25,29 +25,32 @@ import metrics_influxdb.api.measurements.CategoriesMetricMeasurementTransformer;
 public class MetricTest {
 	protected static volatile ConsoleReporter console = MetricsHandler.console();
 	private static final Timer mtimer = MetricsHandler.timer("Metric-Timer");
+
 	public static void test() {
-		while(true) {
+		while (true) {
 			Context ctx = mtimer.time();
-			try{
-				Thread.sleep(60*1000l);
+			try {
+				Thread.sleep(60 * 1000l);
 				System.out.println("______________________________________________________________");
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}finally{
+			} finally {
 				ctx.close();
 			}
 		}
 	}
+
 	public static void jvm() {
 		MetricRegistry metrics = MetricsHandler.registry();
 		metrics.register("jvm.mem", new MemoryUsageGaugeSet());
 		metrics.register("jvm.gc", new GarbageCollectorMetricSet());
 		metrics.register("jvm.thread", new ThreadStatesGaugeSet());
 		metrics.register("jvm.class.load", new ClassLoadingGaugeSet());
-		metrics.register("jvm.cache", new CachedThreadStatesGaugeSet(1,TimeUnit.MILLISECONDS));
+		metrics.register("jvm.cache", new CachedThreadStatesGaugeSet(1, TimeUnit.MILLISECONDS));
 		metrics.register("jvm.buffer.pool", new BufferPoolMetricSet(org.mockito.Mockito.mock(MBeanServer.class)));
 	}
+
 	public static void web() {
 //		Metric.Config
 //	    .WithHttpEndpoint("http://localhost:1234/metrics/")
@@ -55,20 +58,12 @@ public class MetricTest {
 //	    .WithInternalMetrics()
 //	    .WithReporting(config => config
 //	        .WithConsoleReport(TimeSpan.FromSeconds(30));
-		final ScheduledReporter reporter = InfluxdbReporter.forRegistry(MetricsHandler.registry())
-			    .protocol(new HttpInfluxdbProtocol("http", "influxdb-server", 8086, "admin", "53CR3TP455W0RD", "metrics"))
+		final ScheduledReporter reporter = InfluxdbReporter.forRegistry(MetricsHandler.registry()).protocol(new HttpInfluxdbProtocol("http", "influxdb-server", 8086, "admin", "53CR3TP455W0RD", "metrics"))
 //			    .v08()
-			    .convertRatesTo(TimeUnit.SECONDS)
-			    .convertDurationsTo(TimeUnit.MILLISECONDS)
-			    .filter(MetricFilter.ALL)
-			    .skipIdleMetrics(false)
-			    .tag("cluster", "CL01")
-			    .tag("client", "OurImportantClient")
-			    .tag("server", "9086")
-			    .transformer(new CategoriesMetricMeasurementTransformer("module", "artifact"))
-			    .build();
-			reporter.start(10, TimeUnit.SECONDS);
+				.convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).filter(MetricFilter.ALL).skipIdleMetrics(false).tag("cluster", "CL01").tag("client", "OurImportantClient").tag("server", "9086").transformer(new CategoriesMetricMeasurementTransformer("module", "artifact")).build();
+		reporter.start(10, TimeUnit.SECONDS);
 	}
+
 	public static void main(String[] args) {
 		console.start(1, TimeUnit.SECONDS);
 //		test();

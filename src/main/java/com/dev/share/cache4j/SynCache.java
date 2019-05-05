@@ -69,15 +69,18 @@ public class SynCache extends AbstractCache {
 		cacheImpl.setCacheConfig(conf);
 		return cacheImpl;
 	}
+
 	@Override
 	public String getCacheType() {
 		return CACHE_TYPE;
 	}
+
 	public void clean() throws CacheException {
-		if(cacheImpl!=null) {
-			cacheImpl.clear(); 
+		if (cacheImpl != null) {
+			cacheImpl.clear();
 		}
 	}
+
 	public SynchronizedCache getCache() {
 		return cacheImpl;
 	}

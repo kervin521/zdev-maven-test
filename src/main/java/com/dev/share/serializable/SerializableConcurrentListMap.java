@@ -27,40 +27,47 @@ public class SerializableConcurrentListMap<K extends Serializable, T extends Ser
 	public ConcurrentHashMap<K, List<T>> get() {
 		return map;
 	}
+
 	public boolean contains(K key) {
 		return map.containsKey(key);
 	}
-	
+
 	public void set(K key, List<T> objs) {
 		map.put(key, objs);
 	}
+
 	public void put(K key, List<T> objs) {
-		if(!map.containsKey(key)) {
+		if (!map.containsKey(key)) {
 			map.put(key, new ArrayList<T>());
 		}
 		map.get(key).addAll(objs);
 	}
+
 	public void put(K key, T obj) {
-		if(!map.containsKey(key)) {
+		if (!map.containsKey(key)) {
 			map.put(key, new ArrayList<T>());
 		}
 		map.get(key).add(obj);
 	}
-	public List<T> get(K key){
+
+	public List<T> get(K key) {
 		return map.get(key);
 	}
+
 	public void remove(K key) {
 		map.remove(key);
 	}
-	public void remove(K key,T obj) {
+
+	public void remove(K key, T obj) {
 		List<T> objs = map.get(key);
-		if(objs!=null&&objs.contains(obj)) {
+		if (objs != null && objs.contains(obj)) {
 			objs.remove(obj);
 		}
-		if(objs==null||objs.isEmpty()) {
+		if (objs == null || objs.isEmpty()) {
 			remove(key);
 		}
 	}
+
 	/**
 	 * 系统退出时调用，将队列序列化到文件
 	 */
@@ -93,7 +100,7 @@ public class SerializableConcurrentListMap<K extends Serializable, T extends Ser
 	 * 队列初始化时调用，从文件反序列化
 	 * 
 	 * @param filePath
-	 *            文件路径
+	 *                 文件路径
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void setFilePath(String filePath) {

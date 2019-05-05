@@ -9,10 +9,10 @@ public class PropertiesTest {
 		String path = "E:\\Workspace\\KJCX\\zdev-maven-test\\target\\classes\\";
 		System.setProperty("channelId", "96");
 		System.setProperty("kafka", "kafka");
-		String location =path+ "kafka.properties";
-		PropertiesConfiguration config  = new PropertiesConfiguration(location);
+		String location = path + "kafka.properties";
+		PropertiesConfiguration config = new PropertiesConfiguration(location);
 		config.setReloadingStrategy(new FileChangedReloadingStrategy());
-        config.setAutoSave(true);
-        config.setProperty("kafka.enabled", false);
+		config.setAutoSave(true);
+		config.setProperty("kafka.enabled", false);
 	}
 }

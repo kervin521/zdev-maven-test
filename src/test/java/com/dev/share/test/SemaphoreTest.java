@@ -17,11 +17,11 @@ public class SemaphoreTest {
 				public void run() {
 					try {
 						semaphore.acquire();
-						double random = new BigDecimal(Math.random()*10).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+						double random = new BigDecimal(Math.random() * 10).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 						System.out.println("Accessing:" + NO);
-						Thread.sleep(Double.valueOf(random*1000l).longValue());
+						Thread.sleep(Double.valueOf(random * 1000l).longValue());
 						semaphore.release();
-						System.out.println("======>sleep time:"+random+" s,available permits:" + semaphore.availablePermits());
+						System.out.println("======>sleep time:" + random + " s,available permits:" + semaphore.availablePermits());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

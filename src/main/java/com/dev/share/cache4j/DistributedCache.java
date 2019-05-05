@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-
 /**
  * 基于redisson造的分布式缓存cache,只附加失效时间
+ * 
  * <pre>
  * Created with IntelliJ IDEA.
  * User: lwb
@@ -21,28 +21,24 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author liwen
  */
-public class DistributedCache implements InitializingBean,DisposableBean,Serializable{
+public class DistributedCache implements InitializingBean, DisposableBean, Serializable {
 
+	private static final Logger LOG = LoggerFactory.getLogger(DistributedCache.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(DistributedCache.class);
+	private transient Map<String, RCacheConfig> cacheConfigs;
 
+	public void destroy() throws Exception {
+	}
 
-    private transient Map<String,RCacheConfig>   cacheConfigs;
+	public void afterPropertiesSet() throws Exception {
+	}
 
+	public RCacheConfig getConfig(String cacheName) {
+		return cacheConfigs.get(cacheName);
+	}
 
-    public void destroy() throws Exception {}
-
-
-    public void afterPropertiesSet() throws Exception {
-    }
-
-
-    public RCacheConfig getConfig(String cacheName){
-    	 return cacheConfigs.get(cacheName);
-    }
-   
-    public void setCacheConfigs(Map<String, RCacheConfig> cacheConfigs) {
-        this.cacheConfigs = cacheConfigs;
-    }
+	public void setCacheConfigs(Map<String, RCacheConfig> cacheConfigs) {
+		this.cacheConfigs = cacheConfigs;
+	}
 
 }

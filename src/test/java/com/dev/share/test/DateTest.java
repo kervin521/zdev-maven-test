@@ -13,7 +13,7 @@ public class DateTest {
 //			
 //			System.out.println("date:"+date);
 //		}
-	    
+
 //		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		Date datetime = format.parse("2019-12-31 23:59:59");
 //		System.out.println(datetime);
@@ -21,9 +21,13 @@ public class DateTest {
 //		System.out.println(datetime.getYear());
 //		String date = format.format(datetime);
 //		System.out.println(date);
-	    LocalDateTime now = LocalDateTime.now();
-        int quarter = 4;
-        LocalDateTime end = YearMonth.of(now.getYear(), (quarter-1)*3).atEndOfMonth().atStartOfDay();
-        System.out.println(end);
+//	    LocalDateTime now = LocalDateTime.now();
+//        int quarter = 4;
+//        LocalDateTime end = YearMonth.of(now.getYear(), (quarter-1)*3).atEndOfMonth().atStartOfDay();
+//        System.out.println(end);
+//        System.setProperty("user.timezone","America/Bahia");
+		System.setProperty("user.timezone", "Asia/Shanghai");
+		System.out.println(LocalDateTime.now());
+		System.out.println("user.timezone：" + System.getProperty("user.timezone"));
 	}
 }

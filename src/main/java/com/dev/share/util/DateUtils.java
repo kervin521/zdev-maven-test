@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,6 +66,10 @@ public class DateUtils {
 	 */
 	public static final String DEFAULT_FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 	/**
+	 * 默认日期时间格式[时间戳(yyyy-MM-dd HH:mm:ss.SSSSSSSSS)]
+	 */
+	public static final String DEFAULT_FORMAT_FULL_DATE_TIME = "yyyy-MM-dd HH:mm:ss.SSSSSSSSS";
+	/**
 	 * 默认日期时间格式[日期型(yyyy-MM-dd)]
 	 */
 	public static final String DEFAULT_FORMAT_DATE = "yyyy-MM-dd";
@@ -106,33 +111,66 @@ public class DateUtils {
 	 */
 	public static final String UTC_FORMAT_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	/**
-	 * 一天毫秒数
+	 * 日最小时间(00:00:00)
 	 */
-	public static final long ONE_DAY = 24 * 60 * 60 * 1000L;
+	public static final String MIN_TIME_OF_DAY = "00:00:00";
 	/**
-	 * 一小时毫秒数
+	 * 日最大时间(23:59:59)
 	 */
-	public static final long ONE_HOUR = 1 * 60 * 60 * 1000L;
+	public static final String MAX_TIME_OF_DAY = "23:59:59";
 	/**
-	 * 一分钟毫秒数
+	 * 日最大时间(23:59:59.999999999)
 	 */
-	public static final long ONE_MINUTE = 1 * 1 * 60 * 1000L;
+	public static final String MAX_FULL_TIME_OF_DAY = "23:59:59.999999999";
 	/**
-	 * 一秒毫秒数
+     * 每天小时数.
+     */
+	public static final int HOURS_PER_DAY = 24;
+    /**
+     * 每小时的分钟数
+     */
+	public static final int MINUTES_PER_HOUR = 60;
+	/**
+     * 每分钟的秒数
+     */
+	public static final int SECONDS_PER_MINUTE = 60;
+	/**
+	 * 每秒的毫秒数
 	 */
-	public static final long ONE_SECOND = 1 * 1 * 1 * 1000L;
+	public static final int MILLIS_PER_SECOND = 1000;
+	/**
+     * 每小时的秒数
+     */
+	public static final int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+	/**
+     * 每天的秒数
+     */
+	public static final int SECONDS_PER_DAY = SECONDS_PER_HOUR * HOURS_PER_DAY;
+	/**
+	 * 每天的毫秒数
+	 */
+	public static final long MILLIS_PER_DAY = SECONDS_PER_DAY * MILLIS_PER_SECOND * 1L;
+	/**
+	 * 每小时的毫秒数
+	 */
+	public static final long MILLIS_PER_HOUR = SECONDS_PER_HOUR * MILLIS_PER_SECOND * 1L;
+	/**
+	 * 每分钟的毫秒数
+	 */
+	public static final long MILLIS_PER_MINUTE = SECONDS_PER_MINUTE * MILLIS_PER_SECOND * 1L;
+	/**
 	/**
 	 * 一年月数
 	 */
-	public static final int ONE_MONTHS_OF_YEAR = 12;
+	public static final int MONTHS_PER_YEAR = 12;
 	/**
 	 * 一个季度月数
 	 */
-	public static final int ONE_MONTHS_OF_QUARTER = 3;
+	public static final int MONTHS_PER_QUARTER = 3;
 	/**
 	 * 一年季度数
 	 */
-	public static final int ONE_QUARTERS_OF_YEAR = 4;
+	public static final int QUARTERS_PER_YEAR = 4;
 
 	/**
 	 * 
@@ -285,10 +323,10 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatDateTime(String dateTime) {
-		if (StringUtils.isEmpty(dateTime)) {
-			return null;
-		}
 		try {
+			if (StringUtils.isEmpty(dateTime)) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE_TIME);
 			if (NumberUtils.isNumber(dateTime)) {
 				Date date = new Date(Long.parseLong(dateTime));
@@ -322,10 +360,10 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatLocalDateTime(String dateTime) {
-		if (StringUtils.isEmpty(dateTime)) {
-			return null;
-		}
 		try {
+			if (StringUtils.isEmpty(dateTime)) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE_TIME);
 			if (NumberUtils.isNumber(dateTime)) {
 				LocalDateTime localDateTime = dateToDateTime(new Date(Long.parseLong(dateTime)));
@@ -390,6 +428,9 @@ public class DateUtils {
 	 * @return
 	 */
 	public static LocalDateTime dateToDateTime(Date date) {
+		if (date==null) {
+			return null;
+		}
 		Instant instant = date.toInstant();
 		ZoneId zoneId = ZoneId.systemDefault();
 		LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
@@ -406,6 +447,9 @@ public class DateUtils {
 	 * @return
 	 */
 	public static LocalDate dateToLocalDate(Date date) {
+		if (date==null) {
+			return null;
+		}
 		Instant instant = date.toInstant();
 		ZoneId zoneId = ZoneId.systemDefault();
 		LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
@@ -437,6 +481,9 @@ public class DateUtils {
 	 * @return
 	 */
 	public static Date dateTimeToDate(LocalDateTime dateTime) {
+		if (dateTime==null) {
+			return null;
+		}
 		ZoneId zoneId = ZoneId.systemDefault();
 		ZonedDateTime zdt = dateTime.atZone(zoneId);
 		Date date = Date.from(zdt.toInstant());
@@ -453,6 +500,9 @@ public class DateUtils {
 	 * @return
 	 */
 	public static Date dateTimeToDate(LocalDate dateTime) {
+		if (dateTime==null) {
+			return null;
+		}
 		ZoneId zoneId = ZoneId.systemDefault();
 		ZonedDateTime zdt = dateTime.atStartOfDay().atZone(zoneId);
 		Date date = Date.from(zdt.toInstant());
@@ -471,10 +521,10 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatDate(String dateTime) {
-		if (StringUtils.isEmpty(dateTime)) {
-			return null;
-		}
 		try {
+			if (StringUtils.isEmpty(dateTime)) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE);
 			if (NumberUtils.isNumber(dateTime)) {
 				Date date = new Date(Long.parseLong(dateTime));
@@ -500,10 +550,10 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatLocalDate(String dateTime) {
-		if (StringUtils.isEmpty(dateTime)) {
-			return null;
-		}
 		try {
+			if (StringUtils.isEmpty(dateTime)) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
 			if (NumberUtils.isNumber(dateTime)) {
 				LocalDateTime localDateTime = dateToDateTime(new Date(Long.parseLong(dateTime)));
@@ -530,6 +580,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatToDate(Date dateTime) {
+		if (dateTime==null) {
+			return null;
+		}
 		String date = formatDate(dateTime);
 		dateTime = formatDate(date);
 		return dateTime;
@@ -548,6 +601,9 @@ public class DateUtils {
 	 */
 	public static String formatDateTime(Date dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE_TIME);
 			return sdf.format(dateTime);
 		} catch (Exception e) {
@@ -569,6 +625,9 @@ public class DateUtils {
 	 */
 	public static String formatDateTime(LocalDateTime dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -591,6 +650,9 @@ public class DateUtils {
 	 */
 	public static String formatDateHMTime(Date dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME);
 			return sdf.format(dateTime);
 		} catch (Exception e) {
@@ -612,6 +674,9 @@ public class DateUtils {
 	 */
 	public static String formatDateHMTime(LocalDateTime dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_DATE_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -634,6 +699,9 @@ public class DateUtils {
 	 */
 	public static String formatDate(Date dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE);
 			return sdf.format(dateTime);
 		} catch (Exception e) {
@@ -655,6 +723,9 @@ public class DateUtils {
 	 */
 	public static String formatDate(LocalDateTime dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -677,6 +748,9 @@ public class DateUtils {
 	 */
 	public static String formatDate(LocalDate dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_DATE);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -699,6 +773,9 @@ public class DateUtils {
 	 */
 	public static String formatTime(Date dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_TIME);
 			return sdf.format(dateTime);
 		} catch (Exception e) {
@@ -720,6 +797,9 @@ public class DateUtils {
 	 */
 	public static String formatTime(LocalDateTime dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMAT_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -742,6 +822,9 @@ public class DateUtils {
 	 */
 	public static String formatHMStr(Date dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_PATTERN_TIME);
 			return sdf.format(dateTime);
 		} catch (Exception e) {
@@ -763,6 +846,9 @@ public class DateUtils {
 	 */
 	public static String formatHMStr(LocalDateTime dateTime) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_PATTERN_TIME);
 			ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 			return zone.format(formatter);
@@ -784,10 +870,10 @@ public class DateUtils {
 	 * 
 	 */
 	public static boolean isDateTime(String dateTime) {
-		if (dateTime == null) {
-			return false;
-		}
 		try {
+			if (dateTime == null) {
+				return false;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_FORMAT_DATE_TIME);
 			sdf.parse(dateTime);
 			return true;
@@ -811,6 +897,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByMinute(Date dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.MINUTE, interval);
@@ -835,6 +924,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByMinute(LocalDateTime dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			dateTime = interval > 0 ? dateTime.plusMinutes(interval) : dateTime.minusMinutes(Math.abs(interval));
 		} catch (Exception e) {
 			logger.error("--间隔指定分钟后日期异常!", e);
@@ -856,6 +948,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByHour(Date dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return null;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.HOUR, interval);
@@ -880,6 +975,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByHour(LocalDateTime dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusHours(interval) : dateTime.minusHours(Math.abs(interval));
 		} catch (Exception e) {
 			logger.error("--间隔指定小时后日期异常!", e);
@@ -901,6 +999,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByDay(Date dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.DAY_OF_MONTH, interval);
@@ -925,6 +1026,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByDay(LocalDateTime dateTime, int interval) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusDays(interval) : dateTime.minusDays(Math.abs(interval));
 		} catch (Exception e) {
 			logger.error("--间隔指定天数后日期异常!", e);
@@ -947,6 +1051,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByMonth(Date dateTime, int interval, int day) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.MONTH, interval);
@@ -973,6 +1080,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByMonth(LocalDateTime dateTime, int interval, int day) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusMonths(interval) : dateTime.minusMonths(Math.abs(interval));
 			dateTime = dateTime.withDayOfMonth(day);
 		} catch (Exception e) {
@@ -997,6 +1107,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByMonth(Date dateTime, int interval, int num, int week) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.MONTH, interval);
@@ -1029,6 +1142,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByMonth(LocalDateTime dateTime, int interval, int num, int week) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusMonths(interval) : dateTime.minusMonths(Math.abs(interval));
 			dateTime = dateTime.with(TemporalAdjusters.dayOfWeekInMonth(num, week<0?DayOfWeek.MONDAY:DayOfWeek.of(week)));
 		} catch (Exception e) {
@@ -1053,6 +1169,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByYear(Date dateTime, int interval, int month, int day) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.YEAR, interval);
@@ -1081,6 +1200,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByYear(LocalDateTime dateTime, int interval, int month, int day) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusYears(interval) : dateTime.minusYears(Math.abs(interval));
 			dateTime = dateTime.withMonth(month).withDayOfMonth(day);
 		} catch (Exception e) {
@@ -1106,6 +1228,9 @@ public class DateUtils {
 	 */
 	public static Date handleDateTimeByYear(Date dateTime, int interval, int month, int num, int week) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(dateTime);
 			calendar.add(Calendar.YEAR, interval);
@@ -1140,6 +1265,9 @@ public class DateUtils {
 	 */
 	public static LocalDateTime handleDateTimeByYear(LocalDateTime dateTime, int interval, int month, int num, int week) {
 		try {
+			if (dateTime==null) {
+				return dateTime;
+			}
 			dateTime = interval > 0 ? dateTime.plusYears(interval) : dateTime.minusYears(Math.abs(interval));
 			dateTime = dateTime.withMonth(month).with(TemporalAdjusters.dayOfWeekInMonth(num, week<0?DayOfWeek.MONDAY:DayOfWeek.of(week)));
 		} catch (Exception e) {
@@ -1160,6 +1288,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatWeek(Date date) {
+		if (date==null) {
+			return null;
+		}
 		String[] weeks = { "7", "1", "2", "3", "4", "5", "6" };
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
@@ -1183,6 +1314,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatWeek(LocalDate date, String lang) {
+		if (date==null) {
+			return null;
+		}
 		String[] weeks = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
 		if (!StringUtils.isEmpty(lang) && (lang.contains("en") || lang.contains("EN"))) {
 			weeks = new String[] { "Sun.", "Mon.", "Tues.", "Wed.", "Thur.", "Fri.", "Sat." };
@@ -1204,6 +1338,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatWeek(Date date, String lang) {
+		if (date==null) {
+			return null;
+		}
 		String[] weeks = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
 		if (!StringUtils.isEmpty(lang) && (lang.contains("en") || lang.contains("EN"))) {
 			weeks = new String[] { "Sun.", "Mon.", "Tues.", "Wed.", "Thur.", "Fri.", "Sat." };
@@ -1276,6 +1413,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatQuarter(LocalDate date, String lang) {
+		if (date==null) {
+			return null;
+		}
 		String[] quarters = { "第一季度", "第二季度", "第三季度", "第四季度" };
 		if (!StringUtils.isEmpty(lang) && (lang.contains("en") || lang.contains("EN"))) {
 			quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
@@ -1301,6 +1441,9 @@ public class DateUtils {
 	 */
 	public static int intervalSeconds(String from, String to) {
 		try {
+			if (StringUtils.isEmpty(from)||StringUtils.isEmpty(to)) {
+				return -1;
+			}
 			Date startTime = formatDateTime(from);
 			Date endTime = formatDateTime(to);
 			int unit = 1;
@@ -1310,12 +1453,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (double) (ONE_SECOND);
+			double interval = (endTime.getTime() - startTime.getTime()) / (double) (MILLIS_PER_SECOND);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1332,6 +1475,9 @@ public class DateUtils {
 	 */
 	public static int intervalSeconds(Date startTime, Date endTime) {
 		try {
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (startTime.after(endTime)) {
 				Date temp = startTime;
@@ -1339,12 +1485,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (ONE_SECOND);
+			double interval = (endTime.getTime() - startTime.getTime()) / (MILLIS_PER_SECOND);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1361,6 +1507,9 @@ public class DateUtils {
 	 */
 	public static long intervalSeconds(LocalDateTime startTime, LocalDateTime endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.withNano(0);
 			endTime = endTime.withNano(0);
@@ -1375,7 +1524,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 	/**
 	 * 
@@ -1391,6 +1540,9 @@ public class DateUtils {
 	 */
 	public static int intervalMinutes(String from, String to) {
 		try {
+			if (StringUtils.isEmpty(from)||StringUtils.isEmpty(to)) {
+				return -1;
+			}
 			Date startTime = formatDateTime(from);
 			Date endTime = formatDateTime(to);
 			int unit = 1;
@@ -1400,12 +1552,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (double) (ONE_MINUTE);
+			double interval = (endTime.getTime() - startTime.getTime()) / (double) (MILLIS_PER_MINUTE);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 	
 	/**
@@ -1422,6 +1574,9 @@ public class DateUtils {
 	 */
 	public static int intervalMinutes(Date startTime, Date endTime) {
 		try {
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (startTime.after(endTime)) {
 				Date temp = startTime;
@@ -1429,12 +1584,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (ONE_MINUTE);
+			double interval = (endTime.getTime() - startTime.getTime()) / (MILLIS_PER_MINUTE);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 	
 	/**
@@ -1451,6 +1606,9 @@ public class DateUtils {
 	 */
 	public static long intervalMinutes(LocalDateTime startTime, LocalDateTime endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.withSecond(0).withNano(0);
 			endTime = endTime.withSecond(0).withNano(0);
@@ -1465,7 +1623,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1482,6 +1640,9 @@ public class DateUtils {
 	 */
 	public static long intervalMinutes(LocalDate startTime, LocalDate endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (startTime.isAfter(endTime)) {
 				LocalDate temp = startTime;
@@ -1494,7 +1655,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔分钟数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1511,6 +1672,9 @@ public class DateUtils {
 	 */
 	public static int intervalHours(String from, String to) {
 		try {
+			if (StringUtils.isEmpty(from)||StringUtils.isEmpty(to)) {
+				return -1;
+			}
 			Date startTime = formatDateTime(from);
 			Date endTime = formatDateTime(to);
 			int unit = 1;
@@ -1520,12 +1684,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (double) (ONE_HOUR);
+			double interval = (endTime.getTime() - startTime.getTime()) / (double) (MILLIS_PER_HOUR);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1542,6 +1706,9 @@ public class DateUtils {
 	 */
 	public static int intervalHours(Date start, Date end) {
 		try {
+			if (start==null||end==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (start.after(end)) {
 				Date temp = start;
@@ -1549,12 +1716,12 @@ public class DateUtils {
 				end = temp;
 				unit = -1;
 			}
-			double interval = (end.getTime() - start.getTime()) / (double) (ONE_HOUR);
+			double interval = (end.getTime() - start.getTime()) / (double) (MILLIS_PER_HOUR);
 			return (int) Math.floor(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1571,6 +1738,9 @@ public class DateUtils {
 	 */
 	public static long intervalHours(LocalDateTime startTime, LocalDateTime endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.withMinute(0).withSecond(0).withNano(0);
 			endTime = endTime.withMinute(0).withSecond(0).withNano(0);
@@ -1585,7 +1755,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1602,6 +1772,9 @@ public class DateUtils {
 	 */
 	public static long intervalHours(LocalDate startTime, LocalDate endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (startTime.isAfter(endTime)) {
 				LocalDate temp = startTime;
@@ -1614,7 +1787,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔小时数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1631,6 +1804,9 @@ public class DateUtils {
 	 */
 	public static int intervalDays(String from, String to) {
 		try {
+			if (StringUtils.isEmpty(from)||StringUtils.isEmpty(to)) {
+				return -1;
+			}
 			Date startTime = formatDateTime(from);
 			Date endTime = formatDateTime(to);
 			int unit = 1;
@@ -1640,12 +1816,12 @@ public class DateUtils {
 				endTime = temp;
 				unit = -1;
 			}
-			double interval = (endTime.getTime() - startTime.getTime()) / (double) (ONE_DAY);
+			double interval = (endTime.getTime() - startTime.getTime()) / (double) (MILLIS_PER_DAY);
 			return (int) Math.ceil(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1662,6 +1838,9 @@ public class DateUtils {
 	 */
 	public static int intervalDays(Date start, Date end) {
 		try {
+			if (start==null||end==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (start.after(end)) {
 				Date temp = start;
@@ -1669,12 +1848,12 @@ public class DateUtils {
 				end = temp;
 				unit = -1;
 			}
-			double interval = (end.getTime() - start.getTime()) / (double) (ONE_DAY);
+			double interval = (end.getTime() - start.getTime()) / (double) (MILLIS_PER_DAY);
 			return (int) Math.ceil(interval) * unit;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1691,6 +1870,9 @@ public class DateUtils {
 	 */
 	public static long intervalDays(LocalDateTime startTime, LocalDateTime endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.toLocalDate().atStartOfDay();
 			endTime = endTime.toLocalDate().atStartOfDay();
@@ -1705,7 +1887,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1722,6 +1904,9 @@ public class DateUtils {
 	 */
 	public static long intervalDays(LocalDate startTime, LocalDate endTime) {
 		try {// Duration ==> day,hour,minute,second
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (startTime.isAfter(endTime)) {
 				LocalDate temp = startTime;
@@ -1734,7 +1919,7 @@ public class DateUtils {
 		} catch (Exception e) {
 			logger.error("--获取日期间隔天数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1751,6 +1936,9 @@ public class DateUtils {
 	 */
 	public static int intervalMonths(Date start, Date end) {
 		try {
+			if (start==null||end==null) {
+				return -1;
+			}
 			int unit = 1;
 			if (start.after(end)) {
 				Date temp = start;
@@ -1758,12 +1946,12 @@ public class DateUtils {
 				end = temp;
 				unit = -1;
 			}
-			int interval = (Integer.valueOf(formatYear(end)) - Integer.valueOf(formatYear(start))) * ONE_MONTHS_OF_YEAR + ((Integer.valueOf(formatMonth(end)) - Integer.valueOf(formatMonth(start))));
+			int interval = (Integer.valueOf(formatYear(end)) - Integer.valueOf(formatYear(start))) * MONTHS_PER_YEAR + ((Integer.valueOf(formatMonth(end)) - Integer.valueOf(formatMonth(start))));
 			return unit * interval;
 		} catch (Exception e) {
 			logger.error("--获取日期间隔月数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1780,6 +1968,9 @@ public class DateUtils {
 	 */
 	public static long intervalMonths(LocalDateTime startTime, LocalDateTime endTime) {
 		try {
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.with(TemporalAdjusters.firstDayOfMonth());
 			endTime = endTime.with(TemporalAdjusters.firstDayOfMonth());
@@ -1791,11 +1982,11 @@ public class DateUtils {
 			}
 			int years = endTime.getYear() - startTime.getYear();
 			int months = endTime.getMonthValue() - startTime.getMonthValue();
-			return unit * (years * ONE_MONTHS_OF_YEAR + months);
+			return unit * (years * MONTHS_PER_YEAR + months);
 		} catch (Exception e) {
 			logger.error("--获取日期间隔月数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1812,6 +2003,9 @@ public class DateUtils {
 	 */
 	public static long intervalMonths(LocalDate startTime, LocalDate endTime) {
 		try {
+			if (startTime==null||endTime==null) {
+				return -1;
+			}
 			int unit = 1;
 			startTime = startTime.with(TemporalAdjusters.firstDayOfMonth());
 			endTime = endTime.with(TemporalAdjusters.firstDayOfMonth());
@@ -1823,11 +2017,11 @@ public class DateUtils {
 			}
 			int years = endTime.getYear() - startTime.getYear();
 			int months = endTime.getMonthValue() - startTime.getMonthValue();
-			return unit * (years * ONE_MONTHS_OF_YEAR + months);
+			return unit * (years * MONTHS_PER_YEAR + months);
 		} catch (Exception e) {
 			logger.error("--获取日期间隔月数失败!", e);
 		}
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -1842,6 +2036,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatDay(Date date) {
+		if(date == null) {
+			return null;
+		}
 		SimpleDateFormat formatter = new SimpleDateFormat("dd");
 		String ctime = formatter.format(date);
 		return ctime;
@@ -1859,6 +2056,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatDay(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
 		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1876,6 +2076,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatDay(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
 		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1893,6 +2096,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatMonth(Date dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		SimpleDateFormat formatter = new SimpleDateFormat("MM");
 		String ctime = formatter.format(dateTime);
 		return ctime;
@@ -1910,6 +2116,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatMonth(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM");
 		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1927,6 +2136,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatMonth(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM");
 		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1944,6 +2156,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatYear(Date dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy");
 		String ctime = formatter.format(dateTime);
 		return ctime;
@@ -1961,6 +2176,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatYear(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
 		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1978,6 +2196,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatYear(LocalDate date) {
+		if(date == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
 		ZonedDateTime zone = ZonedDateTime.of(date.atStartOfDay(), ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -1995,6 +2216,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatFirstTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		String dateTime = formatDate(date) + " 00:00:00";
 		date = formatDateTime(dateTime);
 		return date;
@@ -2012,6 +2236,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatFirstTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.toLocalDate().atStartOfDay();
 		return dateTime;
 	}
@@ -2028,6 +2255,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatFirstTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		return dateTime.atStartOfDay();
 	}
 
@@ -2043,6 +2273,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatLastTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		String dateTime = formatDate(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
@@ -2059,6 +2292,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatLastTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
 		return dateTime;
 	}
@@ -2075,6 +2311,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatLastTime(LocalDate date) {
+		if(date == null) {
+			return null;
+		}
 		LocalDateTime dateTime = LocalDateTime.of(date, LocalTime.MAX);
 		return dateTime;
 	}
@@ -2091,6 +2330,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatWeekFirstTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -2111,6 +2353,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatWeekFirstTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.minusWeeks(1).with(DayOfWeek.SUNDAY);
 		return dateTime.toLocalDate().atStartOfDay();
 	}
@@ -2127,6 +2372,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatWeekFirstTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(DayOfWeek.SUNDAY);
 		return dateTime;
 	}
@@ -2143,6 +2391,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatWeekLastTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
@@ -2162,6 +2413,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatWeekLastTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(DayOfWeek.SATURDAY);
 		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
 		return dateTime;
@@ -2179,6 +2433,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatWeekLastTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(DayOfWeek.SATURDAY);
 		dateTime = LocalDateTime.of(dateTime, LocalTime.MAX).toLocalDate();
 		return dateTime;
@@ -2196,6 +2453,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatMonthFirstTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -2216,6 +2476,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatMonthFirstTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.withDayOfMonth(1);
 		dateTime = dateTime.toLocalDate().atStartOfDay();
 		return dateTime;
@@ -2233,6 +2496,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatMonthFirstTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.withDayOfMonth(1);
 		return dateTime;
 	}
@@ -2249,11 +2515,14 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatMonthLastTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.MONTH, 1);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
-		date.setTime(calendar.getTimeInMillis() - ONE_DAY);
+		date.setTime(calendar.getTimeInMillis() - MILLIS_PER_DAY);
 		String dateTime = formatDate(date) + " 23:59:59";
 		return formatDateTime(dateTime);
 	}
@@ -2270,6 +2539,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatMonthLastTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.lastDayOfMonth());
 		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
 		return dateTime;
@@ -2287,6 +2559,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatMonthLastTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.lastDayOfMonth());
 		return dateTime;
 	}
@@ -2303,6 +2578,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatYearFirstTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		String dateTime = formatYear(date) + "-01-01 00:00:00";
 		return formatDateTime(dateTime);
 	}
@@ -2319,6 +2597,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatYearFirstTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.firstDayOfYear());
 		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MIDNIGHT);
 		return dateTime;
@@ -2336,6 +2617,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatYearFirstTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.firstDayOfYear());
 		return dateTime;
 	}
@@ -2352,6 +2636,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static Date formatYearLastTime(Date date) {
+		if(date == null) {
+			return null;
+		}
 		String dateTime = formatYear(date) + "-12-31 23:59:59";
 		return formatDateTime(dateTime);
 	}
@@ -2368,6 +2655,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDateTime formatYearLastTime(LocalDateTime dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.lastDayOfYear());
 		dateTime = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
 		return dateTime;
@@ -2385,6 +2675,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static LocalDate formatYearLastTime(LocalDate dateTime) {
+		if(dateTime == null) {
+			return null;
+		}
 		dateTime = dateTime.with(TemporalAdjusters.lastDayOfYear());
 		return dateTime;
 	}
@@ -2401,6 +2694,9 @@ public class DateUtils {
 	 * 
 	 */
 	public static String formatChinaDate(Date date) {
+		if(date == null) {
+			return null;
+		}
 		String format = "yyyy年MM月dd日";
 		return formatDateTime(date, format);
 	}
@@ -2420,6 +2716,9 @@ public class DateUtils {
 	public static String formatUTCDateTime(Date date, String format) {
 		if (StringUtils.isEmpty(format)) {
 			format = UTC_FORMAT_DATE_TIME;
+		}
+		if(date == null) {
+			return null;
 		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -2445,6 +2744,9 @@ public class DateUtils {
 		if (StringUtils.isEmpty(format)) {
 			format = UTC_FORMAT_DATE_TIME;
 		}
+		if(dateTime == null) {
+			return null;
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 		ZonedDateTime zone = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
 		return zone.format(formatter);
@@ -2465,6 +2767,9 @@ public class DateUtils {
 	public static String formatUTCDateTime(LocalDate dateTime, String format) {
 		if (StringUtils.isEmpty(format)) {
 			format = UTC_FORMAT_DATE_TIME;
+		}
+		if(dateTime == null) {
+			return null;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
@@ -2590,8 +2895,20 @@ public class DateUtils {
 	 * @return
 	 */
 	public static String formatRangeDateEng(Date start, Date end) {
-		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
+		String rangeTime = null;
+		boolean isSameYear = start!=null&&end!=null?start.toInstant().get(ChronoField.YEAR)==end.toInstant().get(ChronoField.YEAR):true;
+		if(start!=null) {
+			rangeTime = formatDateTime(start, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+		}
+		if(end!=null) {
+			rangeTime = rangeTime!=null?rangeTime+"~":"";
+			String temp = formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE:DEFAULT_FORMAT_DATE);
+			if(rangeTime.startsWith(temp)) {
+				rangeTime += formatDateTime(end, FORMAT_PATTERN_TIME);
+			}else {
+				rangeTime += formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+			}
+		}
 		return rangeTime;
 	}
 
@@ -2606,8 +2923,20 @@ public class DateUtils {
 	 * @return
 	 */
 	public static String formatRangeDateEng(LocalDateTime start, LocalDateTime end) {
-		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
+		String rangeTime = null;
+		boolean isSameYear = start!=null&&end!=null?start.getYear()==end.getYear():true;
+		if(start!=null) {
+			rangeTime = formatDateTime(start, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+		}
+		if(end!=null) {
+			rangeTime = rangeTime!=null?rangeTime+"~":"";
+			String temp = formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE:DEFAULT_FORMAT_DATE);
+			if(rangeTime.startsWith(temp)) {
+				rangeTime += formatDateTime(end, FORMAT_PATTERN_TIME);
+			}else {
+				rangeTime += formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+			}
+		}
 		return rangeTime;
 	}
 
@@ -2622,8 +2951,20 @@ public class DateUtils {
 	 * @return
 	 */
 	public static String formatRangeDateEng(LocalDate start, LocalDate end) {
-		String rangeTime = formatDateTime(start, FORMAT_PATTERN_DATE_TIME);
-		rangeTime += "~" + formatDateTime(end, FORMAT_PATTERN_TIME);
+		String rangeTime = null;
+		boolean isSameYear = start!=null&&end!=null?start.getYear()==end.getYear():true;
+		if(start!=null) {
+			rangeTime = formatDateTime(start, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+		}
+		if(end!=null) {
+			rangeTime = rangeTime!=null?rangeTime+"~":"";
+			String temp = formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE:DEFAULT_FORMAT_DATE);
+			if(rangeTime.startsWith(temp)) {
+				rangeTime += formatDateTime(end, FORMAT_PATTERN_TIME);
+			}else {
+				rangeTime += formatDateTime(end, isSameYear?FORMAT_PATTERN_DATE_TIME:FORMAT_DATE_TIME);
+			}
+		}
 		return rangeTime;
 	}
 
@@ -2640,7 +2981,7 @@ public class DateUtils {
 		LocalDateTime currentDateTime = LocalDate.now().withDayOfMonth(1).atStartOfDay();
 		LocalDateTime dateTime = intervalYear > 0 ? currentDateTime.plusYears(intervalYear) : currentDateTime.minusYears(Math.abs(intervalYear));
 		dateTime = formatYearFirstTime(dateTime);
-		int count = ONE_MONTHS_OF_YEAR;
+		int count = MONTHS_PER_YEAR;
 		List<String> months = new ArrayList<String>();
 		for (int i = 0; i < count; i++) {
 			LocalDateTime date = handleDateTimeByMonth(dateTime, i, 1);
@@ -2664,14 +3005,14 @@ public class DateUtils {
 	 */
 	public static Map<Integer, List<String>> handleQuarters(int intervalYear, boolean lessCurrentQuarter) {
 		LocalDateTime currentDateTime = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-		int currentQuarter = Double.valueOf((currentDateTime.getMonthValue() - 1) / ONE_MONTHS_OF_QUARTER + 1).intValue();
+		int currentQuarter = Double.valueOf((currentDateTime.getMonthValue() - 1) / MONTHS_PER_QUARTER + 1).intValue();
 		LocalDateTime dateTime = intervalYear > 0 ? currentDateTime.plusYears(intervalYear) : currentDateTime.minusYears(Math.abs(intervalYear));
 		dateTime = formatYearFirstTime(dateTime);
-		int count = ONE_MONTHS_OF_YEAR;
+		int count = MONTHS_PER_YEAR;
 		Map<Integer, List<String>> map = new HashMap<Integer, List<String>>();
 		for (int i = 0; i < count; i++) {
 			LocalDateTime date = handleDateTimeByMonth(dateTime, i, 1);
-			int quarter = Double.valueOf((date.getMonthValue() - 1) / ONE_MONTHS_OF_QUARTER + 1).intValue();
+			int quarter = Double.valueOf((date.getMonthValue() - 1) / MONTHS_PER_QUARTER + 1).intValue();
 			String month = formatDateTime(date, DEFAULT_FORMAT_MONTH);
 			if (intervalYear >= 0 && lessCurrentQuarter && quarter >= currentQuarter) {
 				break;

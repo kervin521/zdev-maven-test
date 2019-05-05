@@ -20,33 +20,33 @@ import com.dev.share.metrics.MetricsHandler;
 
 import ch.qos.logback.classic.Level;
 
-
 public class SpringXMLKafkaTest {
 	private static Logger logger = LoggerFactory.getLogger(SpringXMLKafkaTest.class);
 	public static int core = Runtime.getRuntime().availableProcessors();
-	public static ScheduledExecutorService schedule = Executors.newScheduledThreadPool(core*2);
+	public static ScheduledExecutorService schedule = Executors.newScheduledThreadPool(core * 2);
 	public static Meter meter = MetricsHandler.meter("Kafka-Producer");
 	public static FileSystemXmlApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:spring-context.xml");
+
 	public static void producer() throws IOException, InterruptedException, ConfigurationException {
 		ctx.registerShutdownHook();
 		ctx.start();
 		Slf4jReporter slf4j = MetricsHandler.slf4j();
-  		slf4j.start(1, TimeUnit.SECONDS);
+		slf4j.start(1, TimeUnit.SECONDS);
 		final KafkaProducerService kafkaProducerService = ctx.getBean(KafkaProducerService.class);
 		schedule.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				String data = "["+DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss")+"]MO/Report消息";
+				String data = "[" + DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss") + "]MO/Report消息";
 				KafkaRecordInfo obj = new KafkaRecordInfo();
 				obj.setContent(data);
-				obj.setName(""+new Date().getTime()%10);
+				obj.setName("" + new Date().getTime() % 10);
 				kafkaProducerService.sendMsg(obj);
 				meter.mark();
 				logger.info("==========================================Send Success=======================================");
 			}
 		}, 1, 10, TimeUnit.SECONDS);
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		producer();
 	}

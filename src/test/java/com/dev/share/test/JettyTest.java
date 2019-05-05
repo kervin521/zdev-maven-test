@@ -32,23 +32,24 @@ import io.prometheus.client.hotspot.DefaultExports;
 
 public class JettyTest {
 	public static int core = Runtime.getRuntime().availableProcessors();
-	public static ExecutorService shedule = Executors.newScheduledThreadPool(core*2);
+	public static ExecutorService shedule = Executors.newScheduledThreadPool(core * 2);
+
 	public static void test() {
 		Meter meter = MetricsHandler.meter("metric-meter");
 		Timer timer = MetricsHandler.timer("metric-timer");
-		for(int i=0;i<10;i++) {
+		for (int i = 0; i < 10; i++) {
 			shedule.execute(new AbstractRunnable(i) {
 				@Override
 				public void run() {
 					long time = System.currentTimeMillis();
 					final int worker = this.getWorker();
-					while(true) {
+					while (true) {
 						long start = System.currentTimeMillis();
 						String result = null;
 						meter.mark();
 						Context ctx = timer.time();
-						try{
-							Thread.sleep(5*1000l);
+						try {
+							Thread.sleep(5 * 1000l);
 							String target = "【春天的风】来自106，请在30秒内按页面提示提交，若非本人操作，请忽略！";
 //							String target = "2018.12.29_"+new Date().getTime()+"_"+new Random().nextInt(size);
 //							List<String> phones = new ArrayList<>();
@@ -59,7 +60,7 @@ public class JettyTest {
 //							String target = StringUtils.join(phones, ",");
 							result = CipherUtils.hmac(target);
 							long delay = System.currentTimeMillis();
-							System.out.println("------------------------------------["+worker+"]{use:"+StringUtils.time(start, delay)+",time:"+StringUtils.time(time, delay)+",result:"+result);
+							System.out.println("------------------------------------[" + worker + "]{use:" + StringUtils.time(start, delay) + ",time:" + StringUtils.time(time, delay) + ",result:" + result);
 //							long diff = Double.valueOf((delay-time)/1000).longValue();
 //							if(diff%10==0) {
 //								System.out.println("------------------------------------["+worker+"]{time:"+StringUtils.time(time, delay)+",target:"+result+",result:"+result);
@@ -67,7 +68,7 @@ public class JettyTest {
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}finally{
+						} finally {
 							ctx.close();
 						}
 					}
@@ -75,6 +76,7 @@ public class JettyTest {
 			});
 		}
 	}
+
 	public static void main(String[] args) {
 		try {
 			Server server = new Server(8080);
@@ -111,11 +113,11 @@ public class JettyTest {
 			context.addServlet(new ServletHolder(io.prometheus.client.exporter.MetricsServlet.class), "/enums/prometheus");
 //			DefaultExports.initialize();
 			DropwizardExports prometheus = new DropwizardExports(MetricsHandler.registry());
-	        prometheus.register();
-			System.setProperty("metric.enabled","true");
-			System.setProperty("metric.mode","console");
-			System.setProperty("metric.jvm.enabled","false");
-			System.setProperty("metric.logger.level","info");
+			prometheus.register();
+			System.setProperty("metric.enabled", "true");
+			System.setProperty("metric.mode", "console");
+			System.setProperty("metric.jvm.enabled", "false");
+			System.setProperty("metric.logger.level", "info");
 			server.start();
 			test();
 			server.join();

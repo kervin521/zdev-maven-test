@@ -8,6 +8,6 @@ public abstract class ShutdownHookHandler {
 			}
 		});
 	}
-	
+
 	public abstract void shutdown();
 }

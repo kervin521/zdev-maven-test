@@ -21,47 +21,49 @@ public class FileTest {
 		file.createNewFile();
 		FileWriter writer = new FileWriter(file);
 		List<String> list = new ArrayList<>();
-		for(int i=20899;i<44899;i+=1000) {
-			String phone = "netstat -ano|grep "+i;
+		for (int i = 20899; i < 44899; i += 1000) {
+			String phone = "netstat -ano|grep " + i;
 			list.add(phone);
 		}
 		writer.write(StringUtils.join(list, "\n"));
 		writer.flush();
 		writer.close();
-		System.out.println("========================================="+list.size());
+		System.out.println("=========================================" + list.size());
 	}
+
 	public static List<String> read() throws IOException {
 		System.out.println("=========================================");
 		String dpath = "E:\\home\\game";
 		File direct = new File(dpath);
 		File[] files = direct.listFiles();
 		List<String> list = new ArrayList<>();
-		for (File file  : files) {
+		for (File file : files) {
 			String fileName = file.getName();
-			if("phone1.txt".equals(fileName)) {
+			if ("phone1.txt".equals(fileName)) {
 				continue;
 			}
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String temp = null;
 			while ((temp = reader.readLine()) != null) {
 				List<String> sub = new ArrayList<String>(Arrays.asList(temp.split(",")));
-				System.out.println("-----------------file:"+fileName+",size:"+sub.size());
+				System.out.println("-----------------file:" + fileName + ",size:" + sub.size());
 				list.addAll(sub);
 			}
 			reader.close();
 		}
-		System.out.println("========================================="+list.size());
+		System.out.println("=========================================" + list.size());
 		return list;
 	}
+
 	public static void write(List<String> list) throws IOException {
-		if(list==null) {
+		if (list == null) {
 			list = new ArrayList<>();
 		}
 		int total = list.size();
-		int mode = total%10000;
-		String subfix = Double.valueOf((total/10000)).intValue()+"w"+(mode>0?"_"+mode:"");
+		int mode = total % 10000;
+		String subfix = Double.valueOf((total / 10000)).intValue() + "w" + (mode > 0 ? "_" + mode : "");
 		System.out.println("=========================================");
-		String path = "E:\\home\\phone_"+subfix+".txt";
+		String path = "E:\\home\\phone_" + subfix + ".txt";
 		File file = new File(path);
 //		file.deleteOnExit();
 		file.createNewFile();
@@ -70,8 +72,9 @@ public class FileTest {
 		writer.write(StringUtils.join(list, ","));
 		writer.flush();
 		writer.close();
-		System.out.println("========================================="+list.size());
+		System.out.println("=========================================" + list.size());
 	}
+
 	public static void main(String[] args) throws IOException {
 //		String path = "E:\\home\\game";
 //		File direct = new File(path);
@@ -82,10 +85,10 @@ public class FileTest {
 //		}
 //		System.out.println(str);
 		System.out.println("=========================================");
-		
+
 		List<String> list = new ArrayList<>();
-		for(int i=1000000;i<1001000;i++) {
-			String phone = "138"+i+""+new Random().nextInt(10);
+		for (int i = 1000000; i < 1001000; i++) {
+			String phone = "138" + i + "" + new Random().nextInt(10);
 			list.add(phone);
 		}
 //		List<String> list = read();
