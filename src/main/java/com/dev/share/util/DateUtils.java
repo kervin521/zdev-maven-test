@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -107,9 +108,13 @@ public class DateUtils {
 	public static final String ISO_FORMAT_DATE_TIME = "MM/dd/yyyy HH:mm:ss";
 
 	/**
-	 * 日期时间格式[时间戳(yyyy-MM-dd'T'HH:mm:ss.SSSZ)]
+	 * 日期时间格式[时间戳(yyyy-MM-dd'T'HH:mm:ss.SSS'Z')]
 	 */
-	public static final String UTC_FORMAT_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	public static final String UTC_FORMAT_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	/**
+	 * 日期时间格式[时间戳(yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z')]
+	 */
+	public static final String DEFAULT_UTC_FORMAT_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'";
 	/**
 	 * 日最小时间(00:00:00)
 	 */
@@ -2775,7 +2780,72 @@ public class DateUtils {
 		ZonedDateTime zone = ZonedDateTime.of(dateTime.atStartOfDay(), ZoneId.systemDefault());
 		return zone.format(formatter);
 	}
-
+	/**
+	 *  描述: 日期时区转换
+	 * @author ZhangYi
+	 * @date 2019-05-09 17:11:44
+	 * @param dateTime	日期
+	 * @param fromZone	日期时区
+	 * @param toZone	转换时区
+	 * @return
+	 */
+	public static LocalDateTime formatZone(LocalDateTime dateTime, ZoneId fromZone,ZoneId toZone) {
+		if(dateTime == null) {
+			return null;
+		}
+		if(fromZone == null) {
+			fromZone = ZoneId.systemDefault();
+		}
+		if(toZone == null) {
+			toZone = ZoneId.systemDefault();
+		}
+		LocalDateTime datetime = dateTime.atZone(fromZone).withZoneSameInstant(toZone).toLocalDateTime();
+		return datetime;
+	}
+	/**
+	 *  描述: 日期时区转换
+	 * @author ZhangYi
+	 * @date 2019-05-09 17:11:44
+	 * @param date	日期
+	 * @param fromZone	日期时区
+	 * @param toZone	转换时区
+	 * @return
+	 */
+	public static LocalDate formatZone(LocalDate date, ZoneId fromZone,ZoneId toZone) {
+		if(date == null) {
+			return null;
+		}
+		if(fromZone == null) {
+			fromZone = ZoneId.systemDefault();
+		}
+		if(toZone == null) {
+			toZone = ZoneId.systemDefault();
+		}
+		LocalDate datetime = date.atStartOfDay().atZone(fromZone).withZoneSameInstant(toZone).toLocalDate();
+		return datetime;
+	}
+	/**
+	 *  描述: 日期时区转换
+	 * @author ZhangYi
+	 * @date 2019-05-09 17:11:44
+	 * @param date	日期
+	 * @param fromZone	日期时区
+	 * @param toZone	转换时区
+	 * @return
+	 */
+	public static Date formatZone(Date date, ZoneId fromZone,ZoneId toZone) {
+		if(date == null) {
+			return null;
+		}
+		if(fromZone == null) {
+			fromZone = ZoneId.systemDefault();
+		}
+		if(toZone == null) {
+			toZone = ZoneId.systemDefault();
+		}
+		Instant instant = date.toInstant().atZone(fromZone).withZoneSameInstant(toZone).toInstant();
+		return Date.from(instant);
+	}
 	/**
 	 * 
 	 * 描述:格式化合并日期时间(格式:yyyy-MM-dd ~ MM-dd 或 yyyy-MM-dd HH:mm ~ yyyy-MM-dd HH:mm)
