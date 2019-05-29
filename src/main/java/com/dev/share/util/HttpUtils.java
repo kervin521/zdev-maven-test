@@ -1,4 +1,4 @@
-package com.hollysys.smart.factory.net;
+package com.dev.share.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -11,6 +11,9 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 /**
   * 项目: SF_Common
   * 描述: HTTP|HTTPS请求
@@ -161,6 +165,56 @@ public class HttpUtils {
 		}
 		return flag;
 	}
+	
+	@SuppressWarnings("unchecked")
+	private static String httpParams(String method,Object params) {
+		StringBuilder builder = new StringBuilder("");
+		if(params==null) {
+			return builder.toString();
+		}
+		if(!(method.equalsIgnoreCase(METHOD_POST)||method.equalsIgnoreCase(METHOD_PUT))) {
+			if(params instanceof Map||params instanceof JSONObject) {
+				Map<Object,Object> map = (Map<Object,Object>)params;
+				for(Entry<Object, Object> entity:map.entrySet()) {
+					Object key = entity.getKey();
+					if(key == null||StringUtils.isBlank(key.toString())) {
+						continue;
+					}
+					Object value = entity.getValue();
+					if(StringUtils.isNotBlank(builder.toString())) {
+						builder.append("&");
+					}
+					builder.append(key+"="+value);
+				}
+			}else if(params instanceof Collection) {
+				Collection<Object> objs = ((Collection<Object>)params);
+				Object obj = objs.stream().filter(Objects::nonNull).findAny().orElse(Collections.emptyMap());
+				if(obj instanceof Map||obj instanceof JSONObject) {
+					for (Object object : objs) {
+						Map<Object,Object> map = (Map<Object,Object>)object;
+						for(Entry<Object, Object> entity:map.entrySet()) {
+							Object key = entity.getKey();
+							if(key == null||StringUtils.isBlank(key.toString())) {
+								continue;
+							}
+							Object value = entity.getValue();
+							if(StringUtils.isNotBlank(builder.toString())) {
+								builder.append("&");
+							}
+							builder.append(key+"="+value);
+						}
+					}
+				}else{
+					builder.append(JSON.toJSONString(params));
+				}
+			}else {
+				builder.append(params);
+			}
+		}else {
+			builder.append(JSON.toJSONString(params));
+		}
+		return builder.toString();
+	}
 	/**
 	 * @param url 请求URL
 	 * @param method 请求URL
@@ -173,131 +227,86 @@ public class HttpUtils {
 		return result;
 	}
 	/**
-	 * @param url 请求URL
-	 * @param method 请求URL
-	 * @param param	json参数(post|put)
+	   *  描述: Http请求封装
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url	请求URL
+	 * @param method	请求方式
+	 * @param params	请求参数
+	 * @param headers	请求头
 	 * @param auth	认证信息(username+":"+password)
-	 * @return 返回结果
+	 * @return
 	 */
-	public static String httpRequest(String url,String method,List<Object> params,Map<String,String> headers,String auth){
-		String result = null;
-		HttpResponse response = null;
-		try {
-			String contentType = "application/json";
-			String param = "";
-			if(params!=null&&!params.isEmpty()) {
-				Object obj = params.stream().filter(Objects::nonNull).findAny();
-				if(!(method.equalsIgnoreCase(METHOD_POST)||method.equalsIgnoreCase(METHOD_PUT))&&obj instanceof Map) {
-					for (Object object : params) {
-						Map<Object,Object> objs = (Map<Object,Object>)object;
-						for(Entry<Object, Object> entity:objs.entrySet()) {
-							Object key = entity.getKey();
-							if(key instanceof String &&StringUtils.isBlank((String)key)) {
-								continue;
-							}
-							Object value = entity.getValue();
-							if(!"".equals(param)) {
-								param += "&";
-							}
-							param += key+"="+value;
-						}
-					}
-					url += (url.contains("?")?(url.endsWith("&")?"":"&"):"?")+param;
-				}else {
-					param = JSON.toJSONString(params);
-				}
-			}
-			HttpRequestBase http = new HttpGet(url);
-			if(method.equalsIgnoreCase(METHOD_POST)){
-				http = new HttpPost(url);
-				StringEntity body = new StringEntity(param,ContentType.APPLICATION_JSON);
-				body.setContentType(contentType);
-				((HttpPost)http).setEntity(body);
-			}else if(method.equalsIgnoreCase(METHOD_PUT)){
-				http = new HttpPut(url);
-				StringEntity body = new StringEntity(param,ContentType.APPLICATION_JSON);
-				body.setContentType(contentType);
-				((HttpPut)http).setEntity(body);
-			}else if(method.equalsIgnoreCase(METHOD_DELETE)){
-				http = new HttpDelete(url);
-			}else if(method.equalsIgnoreCase(METHOD_HEAD)){
-				http = new HttpHead(url);
-			}else if(method.equalsIgnoreCase(METHOD_OPTIONS)){
-				http = new HttpOptions(url);
-			}else if(method.equalsIgnoreCase(METHOD_TRACE)){
-				http = new HttpTrace(url);
-			}
-			if(auth!=null&&!"".equals(auth)){
-				String authorization = "Basic "+new String(Base64.encodeBase64(auth.getBytes()));
-				http.setHeader("Authorization", authorization);
-			}
-			http.setHeader("Connection", "close");
-			if(headers!=null&&!headers.isEmpty()) {
-				for(Entry<String, String> entity:headers.entrySet()) {
-					String key = entity.getKey();
-					if(StringUtils.isBlank(key)) {
-						continue;
-					}
-					String value = entity.getValue();
-					http.setHeader(key, value);
-				}
-			}
-			response = client.execute(http);
-			if(response.getStatusLine().getStatusCode()==HttpURLConnection.HTTP_OK||response.getStatusLine().getStatusCode()==HttpURLConnection.HTTP_CREATED){
-				HttpEntity entity = response.getEntity();
-				result = EntityUtils.toString(entity,Consts.UTF_8);
-			}else {
-				result = "{\"statuscode\":"+response.getStatusLine().getStatusCode()+",\"message\":\""+response.getStatusLine().getReasonPhrase()+"\"}";
-				result = JSON.parseObject(result).toJSONString();
-			}
-		}catch (Exception e) {
-			logger.error("--http request error !",e);
-			result = e.getMessage();
-		}finally {
-			HttpClientUtils.closeQuietly(response);
-		}
+	public static String httpRequest(String url,String method,Map<String,Object> params,Map<String,String> headers,String auth){
+		String result = httpRequest(url, method, params, headers, null, null, auth);
 		return result;
 	}
 	/**
-	 * @param url 请求URL
-	 * @param method 请求URL
-	 * @param param	json参数(post|put)
+	 *  描述: Http请求封装
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url	请求URL
+	 * @param method	请求方式
+	 * @param params	请求参数
+	 * @param headers	请求头
 	 * @param auth	认证信息(username+":"+password)
-	 * @return 返回结果
+	 * @return
 	 */
-	public static String httpRequest(String url,String method,Map<String,Object> params,Map<String,String> headers,String auth){
+	public static <T> String httpRequest(String url,String method,Collection<T> params,Map<String,String> headers,String auth){
+		String result = httpRequest(url, method, params, headers, null, null, auth);
+		return result;
+	}
+	/**
+	   *  描述: Http请求封装
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url	请求URL
+	 * @param method	请求方式
+	 * @param params	请求参数
+	 * @param headers	请求头
+	 * @param contentType	内容类型
+	 * @param charset	编码方式
+	 * @param auth	认证信息(username+":"+password)
+	 * @return
+	 */
+	public static String httpRequest(String url,String method,Object params,Map<String,String> headers,String contentType,String charset,String auth){
 		String result = null;
 		HttpResponse response = null;
 		try {
-			String param = "";
-			if(params!=null&&!params.isEmpty()) {
-				if(!(method.equalsIgnoreCase(METHOD_POST)||method.equalsIgnoreCase(METHOD_PUT))) {
-					for(Entry<String, Object> entity:params.entrySet()) {
-						String key = entity.getKey();
-						if(StringUtils.isBlank(key)) {
-							continue;
-						}
-						Object value = entity.getValue();
-						if(!"".equals(param)) {
-							param += "&";
-						}
-						param += key+"="+value;
+			Charset encode = Consts.UTF_8;
+			if(!StringUtils.isBlank(charset)&&Charset.isSupported(charset)) {
+				encode = Charset.forName(charset);
+			}
+			if(StringUtils.isNotBlank(contentType)) {
+				if(contentType.contains("\"")||contentType.contains(";")||contentType.contains(",")) {
+					int fromIndex = contentType.length();
+					if(contentType.contains("\"")) {
+						fromIndex = contentType.indexOf('"');
+					}else if(contentType.contains(",")) {
+						fromIndex = contentType.indexOf(',');
+					}else {
+						fromIndex = contentType.indexOf(';');
 					}
-					url += (url.contains("?")?(url.endsWith("&")?"":"&"):"?")+param;
-				}else {
-					param = JSON.toJSONString(params);
+					contentType = contentType.substring(0, contentType.indexOf(fromIndex));
 				}
+			}else {
+				contentType = ContentType.APPLICATION_JSON.getMimeType();
+			}
+			ContentType httpContentType = ContentType.create(contentType, encode);
+			String param = httpParams(method, params);
+			if(!(method.equalsIgnoreCase(METHOD_POST)||method.equalsIgnoreCase(METHOD_PUT))) {
+				url += (url.contains("?")?(url.endsWith("&")?"":"&"):"?")+param;
 			}
 			HttpRequestBase http = new HttpGet(url);
 			if(method.equalsIgnoreCase(METHOD_POST)){
 				http = new HttpPost(url);
-				StringEntity body = new StringEntity(param,ContentType.APPLICATION_JSON);
-				body.setContentType("application/json");
+				StringEntity body = new StringEntity(param,httpContentType);
+				body.setContentType(httpContentType.getMimeType());
 				((HttpPost)http).setEntity(body);
 			}else if(method.equalsIgnoreCase(METHOD_PUT)){
 				http = new HttpPut(url);
-				StringEntity body = new StringEntity(param,ContentType.APPLICATION_JSON);
-				body.setContentType("application/json");
+				StringEntity body = new StringEntity(param,httpContentType);
+				body.setContentType(httpContentType.getMimeType());
 				((HttpPut)http).setEntity(body);
 			}else if(method.equalsIgnoreCase(METHOD_DELETE)){
 				http = new HttpDelete(url);
@@ -308,7 +317,7 @@ public class HttpUtils {
 			}else if(method.equalsIgnoreCase(METHOD_TRACE)){
 				http = new HttpTrace(url);
 			}
-			if(auth!=null&&!"".equals(auth)){
+			if(StringUtils.isNotBlank(auth)){
 				String authorization = "Basic "+new String(Base64.encodeBase64(auth.getBytes()));
 				http.setHeader(HttpHeaders.AUTHORIZATION, authorization);
 			}
@@ -356,7 +365,7 @@ public class HttpUtils {
 	 * @param auth	认证(username+:+password)
 	 * @return 返回结果
 	 */
-	public static String urlRequest(String url,String method,String param,String contentType,String auth){
+	public static String urlRequest(String url,String method,String param,Map<String,String> headers,String auth){
 		String result = null;
 		try {
 			HttpURLConnection connection = (HttpURLConnection)new URL(url).openConnection();
@@ -366,8 +375,31 @@ public class HttpUtils {
 				String authorization = "Basic "+new String(Base64.encodeBase64(auth.getBytes()));
 				connection.setRequestProperty(HttpHeaders.AUTHORIZATION, authorization);
 			}
+			String contentType = null;
+			String charset = null;
+			if(headers!=null&&!headers.isEmpty()) {
+				for(Entry<String, String> entity:headers.entrySet()) {
+					String key = entity.getKey();
+					if(StringUtils.isBlank(key)) {
+						continue;
+					}
+					String value = entity.getValue();
+					if(key.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)||key.equalsIgnoreCase("contentType")) {
+						contentType = value;
+						continue;
+					}
+					if(key.equalsIgnoreCase(HttpHeaders.CONTENT_ENCODING)||key.equalsIgnoreCase("contentEncoding")) {
+						charset = value;
+						continue;
+					}
+					connection.setRequestProperty(key, value);
+				}
+			}
 			if(StringUtils.isNotBlank(contentType)) {
 				connection.setRequestProperty(HttpHeaders.CONTENT_TYPE, contentType);
+			}
+			if(StringUtils.isNotBlank(charset)&&Charset.isSupported(charset)) {
+				connection.setRequestProperty(HttpHeaders.CONTENT_ENCODING, charset);
 			}
 			connection.setRequestProperty(HttpHeaders.CONNECTION, "close");
 			if(param!=null&&!"".equals(param)){
@@ -424,16 +456,16 @@ public class HttpUtils {
 			if(method.equalsIgnoreCase(METHOD_POST)){
 				http = new HttpPost(url);
 				StringEntity body = new StringEntity(param,ContentType.APPLICATION_JSON);
-				body.setContentType("application/json");
+				body.setContentType(ContentType.APPLICATION_JSON.getMimeType());
 				body.setContentEncoding(charset);
 				((HttpPost)http).setEntity(body);
 			}
 			http.setHeader(HTTP.CONTENT_ENCODING, charset);
-			if(auth!=null&&!"".equals(auth)){
+			if(StringUtils.isNotBlank(auth)){
 				String authorization = "Basic "+new String(Base64.encodeBase64(auth.getBytes()));
-				http.setHeader("Authorization", authorization);
+				http.setHeader(HttpHeaders.AUTHORIZATION, authorization);
 			}
-			http.setHeader("Connection", "close");
+			http.setHeader(HttpHeaders.CONNECTION, "close");
 			CloseableHttpResponse resp = client.execute(http);
 			HttpEntity entity = resp.getEntity();
 			if(resp.getStatusLine().getStatusCode()==HttpURLConnection.HTTP_OK||resp.getStatusLine().getStatusCode()==HttpURLConnection.HTTP_CREATED){
@@ -502,21 +534,31 @@ public class HttpUtils {
 	}
 	public static void main(String[] args) {
 		String id = "";
-		String url = "http://172.21.32.10:8127/api/EPMMOS";
+//		String url = "http://172.21.32.31:8172/hollysys-eam/realtime/read-tags";
+		String url = "http://172.21.32.31:8172/hollysys-eam/realtime/write-tags";
 		if(!"".equals(id)){
 			url=url+"/"+id;
 		}else{
 //			url=url+"/_search";
 		}
-//		String method = "post";
-//		String body = "{\"query\":{\"match\":{\"operator\":\"test\"}}}";
+		
+		String method = "get";
+//		String body = "[\"dbs-test#cd1\",\"dbs-test#cd3\"]";
+		String body = "[\r\n" + 
+				"  {\r\n" + 
+				"    \"tag\": \"A_3\",\r\n" + 
+				"    \"type\": 0,\r\n" + 
+				"    \"value\": \"1\"\r\n" + 
+				"  }\r\n" + 
+				"]";
 //		String body = "{\"name\":\"mobile music\",\"operator\":\"10000\",\"content\":\"I like music!\",\"createTime\":\"2017-04-20\"}";
 		String result = null;
 //		String auth="elastic:elastic";
 		result = ping(url)+"";
 //		result = checkConnection("http://127.0.0.1:9200",null)+"";
 //		System.out.println(result);
-//		result = httpRequest(url, method, null,null);
+		List<JSONObject> params = JSON.parseArray(body, JSONObject.class);
+		result = httpRequest(url, method, params, null, null);
 		System.out.println("---------------------------------------------------------");
 //		result = urlRequest(url, method, param);
 		System.out.println(result);
