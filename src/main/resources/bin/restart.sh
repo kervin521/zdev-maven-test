@@ -15,13 +15,73 @@ case "`uname`" in
 		;;
 esac
 
-APP_NAME=zdev-maven-test
+function ipconf() {
+    case "`uname`" in
+        Darwin)
+         server_ip=`echo "show State:/Network/Global/IPv4" | scutil | grep PrimaryInterface | awk '{print $3}' | xargs ifconfig | grep inet | grep -v inet6 | awk '{print $2}'`
+         ;;
+        *)
+         server_ip=`ip route get 1 | awk '{print $NF;exit}'`
+         ;;
+  esac
+  echo ${server_ip}
+}
+
+
+function ipconf() {
+    case "`uname`" in
+        Darwin)
+         server_ip=`echo "show State:/Network/Global/IPv4" | scutil | grep PrimaryInterface | awk '{print $3}' | xargs ifconfig | grep inet | grep -v inet6 | awk '{print $2}'`
+         ;;
+        *)
+         server_ip=`ip route get 1 | awk '{print $NF;exit}'`
+         ;;
+  esac
+  echo ${server_ip}
+}
+
+function jenv(){
+	eval A='('$*')'
+	for i in ${!A[*]}
+	do
+		OPT=${A[$i]}
+		if [[ $OPT == -D* ]];then
+			JAVA_OPTS=" $JAVA_OPTS $OPT"
+			unset A[$i]
+		fi
+	done
+	echo ${JAVA_OPTS}
+}
+
+function active(){
+	eval A='('$*')'
+	for i in ${!A[*]}
+	do
+		OPT=${A[$i]}
+		if [[ $OPT == -Dspring.profiles.active* ]];then
+			ENV_ACTIVE=${OPT##*=}
+		fi
+	done
+	echo ${ENV_ACTIVE}
+}
+
 CONF=${BASE_PATH}/config/application.properties
+ENV_ACTIVE=`active $*`
+if [ -n "${ENV_ACTIVE}" ] ; then
+	echo "ENV:${ENV_ACTIVE}"
+	if [ -e ${BASE_PATH}/config/application-${ENV_ACTIVE}.properties ] ; then
+		sed -i "s#^spring.profiles.active=.*#spring.profiles.active=$(echo ${ENV_ACTIVE})#g" $CONF
+	fi
+fi
+
+SPRING_BOOT=target-manager-service
 LOG_CONF=${BASE_PATH}/config/log4j2.properties
 ENV_ACTIVE=`sed '/spring.profiles.active/!d;s/.*=//' $CONF | tr -d '\r'`
+echo "ENV_ACTIVE:${ENV_ACTIVE}"
+APP_NAME=${SPRING_BOOT}-${ENV_ACTIVE}
 CONF=${BASE_PATH}/config/application-${ENV_ACTIVE}.properties
 HTTP_PORT=`sed '/server.port/!d;s/.*=//' $CONF | tr -d '\r'`
-SERVER_IP=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v 192.168|grep -v inet6|awk '{print $2}'|tr -d "addr:"`
+SERVER_IP=`ipconf`
 
 if [ -n "${APP_NAME}" ] ; then
 	kid=`ps -ef |grep ${APP_NAME}|grep -v grep|awk '{print $2}'`
@@ -36,7 +96,6 @@ fi
 
 if [ -n "${HTTP_PORT}" -a ! -z "${HTTP_PORT}" ] ; then
 	occupy=`netstat -ano|grep -v grep|grep ${HTTP_PORT}|grep 'LISTEN'`
-	echo $occupy
 	if [ -n "$occupy" ] ; then
 		echo [${SERVER_IP}] Port[${HTTP_PORT}] is occupied!
 		exit 1
@@ -58,7 +117,7 @@ if [ "$JAVA_HOME" != "" ]; then
 else
   JAVA=java
 fi
-JAVA_ENV="-server -Xms512M -Xmx512M -Xss1m"
+JAVA_ENV="`jenv $*` -server -Xms512M -Xmx512M -Xss1m"
 JAVA_OPTS="$JAVA_ENV -DAPP_NAME=${APP_NAME} -Dbase.path=${BASE_PATH} -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djna.nosys=true -Djdk.io.permissionsUseCanonicalPath=true -Dio.netty.noUnsafe=true -Dio.netty.noKeySetOptimization=true -Dio.netty.recycler.maxCapacityPerThread=0 -Dlog4j.shutdownHookEnabled=false -Dlog4j2.disable.jmx=true -Dlog4j.skipJansi=true -XX:+HeapDumpOnOutOfMemoryError "
 eval A='('$*')'
 for i in ${!A[*]}
@@ -86,7 +145,7 @@ then
 	    file=${file##*/}
 	    filename=${file%.*}
 	    echo -----------------file=${file},filename=${filename}------------------
-	    if [[ $filename =~ $APP_NAME ]]; then
+	    if [[ $filename =~ $SPRING_BOOT ]]; then
 	    	app=$file
 	    	echo app jar:$app
 	    	break;
