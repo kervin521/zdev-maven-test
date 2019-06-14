@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -79,6 +78,10 @@ public class DateUtils {
 	 */
 	public static final String DEFAULT_FORMAT_MONTH = "yyyy-MM";
 	/**
+	 * 默认日期时间格式[日期型(yyyy)]
+	 */
+	public static final String DEFAULT_FORMAT_YEAR = "yyyy";
+	/**
 	 * 默认日期时间格式[时刻型(HH:mm:ss)]
 	 */
 	public static final String DEFAULT_FORMAT_TIME = "HH:mm:ss";
@@ -115,6 +118,22 @@ public class DateUtils {
 	 * 日期时间格式[时间戳(yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z')]
 	 */
 	public static final String DEFAULT_UTC_FORMAT_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'";
+	/**
+	 * 简版日期格式[日期型(yyyyMM)]
+	 */
+	public static final String SIMPLIFIED_FORMAT_MONTH = "yyyyMM";
+	/**
+	 * 简版日期格式[日期型(yyyyMMdd)]
+	 */
+	public static final String SIMPLIFIED_FORMAT_DATE = "yyyyMMdd";
+	/**
+	 * 简版时间格式[日期型(HHmmss)]
+	 */
+	public static final String SIMPLIFIED_FORMAT_TIME = "HHmmss";
+	/**
+	 * 简版日期时间格式[日期型(yyyyMMddHHmmss)]
+	 */
+	public static final String SIMPLIFIED_FORMAT_DATE_TIME = "yyyyMMddHHmmss";
 	/**
 	 * 日最小时间(00:00:00)
 	 */
@@ -196,7 +215,9 @@ public class DateUtils {
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 			if (dateTime != null) {
-				dateTime = dateTime.replaceAll(SPLIT_ISO_DATE, SPLIT_DATE);
+				if(dateTime.contains(SPLIT_ISO_DATE)) {
+					dateTime = dateTime.replaceAll(SPLIT_ISO_DATE, SPLIT_DATE);
+				}
 				return dateFormat.parse(dateTime);
 			}
 		} catch (Exception e) {
@@ -222,10 +243,13 @@ public class DateUtils {
 			if (StringUtils.isEmpty(format)) {
 				format = DEFAULT_FORMAT_DATE_TIME;
 			}
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 			if (dateTime != null) {
-				dateTime = dateTime.replaceAll(SPLIT_ISO_DATE, SPLIT_DATE);
-				return LocalDateTime.parse(dateTime, formatter);
+				if(dateTime.contains(SPLIT_ISO_DATE)) {
+					dateTime = dateTime.replaceAll(SPLIT_ISO_DATE, SPLIT_DATE);
+				}
+				//此方式为了兼容所有格式
+				Date date = formatDateTime(dateTime, format);
+				return dateToDateTime(date);
 			}
 		} catch (Exception e) {
 			logger.error("--日期转化指定格式[" + format + "]字符串失败!", e);
@@ -3116,46 +3140,50 @@ public class DateUtils {
 		// calendar.add(Calendar.MONTH, 2);
 		// calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
 		// calendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 4);
-		String CHINA_FORMAT_DATE_TIME = "G yyyy年MM月dd日 a HH时mm分ss秒SSS毫秒 zZ(本年第w周,本月第W周,本年第D天,本月第F星期的E)";
-		String dateTime = formatDateTime(formatDateTime("2016-07-31 13:26:50"), CHINA_FORMAT_DATE_TIME);
-		System.out.println(dateTime);
-		Date today = new Date();
-		System.out.println(dateTimeToDate(today.getTime()));
-		System.out.println(dateToLocalDate(today.getTime()));
-		System.out.println(dateToDateTime(today.getTime()));
-		System.out.println("===================================================================");
-		String start_time = "2018-03-02 12:59:00";
-		String end_time = "2018-03-02 12:59:59";
-		Date start = formatDateTime(start_time);
-		Date end = formatDateTime(end_time);
-		LocalDateTime startTime = formatLocalDateTime(start_time);
-		LocalDateTime endTime = formatLocalDateTime(end_time);
-		System.out.println("========================================================================");
-		LocalDateTime now = LocalDateTime.now();
-		System.out.println(formatFirstTime(now));
-		System.out.println(formatLastTime(now));
-		System.out.println(formatFirstTime(today));
-		System.out.println(formatLastTime(today));
-		System.out.println("========================================================================");
-		System.out.println(formatWeekFirstTime(now));
-		System.out.println(formatWeekLastTime(now));
-		System.out.println(formatWeekFirstTime(today));
-		System.out.println(formatWeekLastTime(today));
-		System.out.println("========================================================================");
-		System.out.println(formatMonthFirstTime(now));
-		System.out.println(formatMonthLastTime(now));
-		System.out.println(formatMonthFirstTime(today));
-		System.out.println(formatMonthLastTime(today));
-		System.out.println("========================================================================");
-		System.out.println(intervalSeconds(start, end));
-		System.out.println(intervalSeconds(startTime, endTime));
-		System.out.println("========================================================================");
-		System.out.println(handleDateTimeByMonth(today, 0,-2,1));
-		System.out.println(handleDateTimeByMonth(now, 0,-2,1));
-		System.out.println("========================================================================");
-		List<String> months = handleMonths(1, true);
-		System.out.println(months);
-		Map<Integer, List<String>> map = handleQuarters(1, true);
-		System.out.println(map);
+//		String CHINA_FORMAT_DATE_TIME = "G yyyy年MM月dd日 a HH时mm分ss秒SSS毫秒 zZ(本年第w周,本月第W周,本年第D天,本月第F星期的E)";
+//		String dateTime = formatDateTime(formatDateTime("2016-07-31 13:26:50"), CHINA_FORMAT_DATE_TIME);
+//		System.out.println(dateTime);
+//		Date today = new Date();
+//		System.out.println(dateTimeToDate(today.getTime()));
+//		System.out.println(dateToLocalDate(today.getTime()));
+//		System.out.println(dateToDateTime(today.getTime()));
+//		System.out.println("===================================================================");
+//		String start_time = "2018-03-02 12:59:00";
+//		String end_time = "2018-03-02 12:59:59";
+//		Date start = formatDateTime(start_time);
+//		Date end = formatDateTime(end_time);
+//		LocalDateTime startTime = formatLocalDateTime(start_time);
+//		LocalDateTime endTime = formatLocalDateTime(end_time);
+//		System.out.println("========================================================================");
+//		LocalDateTime now = LocalDateTime.now();
+//		System.out.println(formatFirstTime(now));
+//		System.out.println(formatLastTime(now));
+//		System.out.println(formatFirstTime(today));
+//		System.out.println(formatLastTime(today));
+//		System.out.println("========================================================================");
+//		System.out.println(formatWeekFirstTime(now));
+//		System.out.println(formatWeekLastTime(now));
+//		System.out.println(formatWeekFirstTime(today));
+//		System.out.println(formatWeekLastTime(today));
+//		System.out.println("========================================================================");
+//		System.out.println(formatMonthFirstTime(now));
+//		System.out.println(formatMonthLastTime(now));
+//		System.out.println(formatMonthFirstTime(today));
+//		System.out.println(formatMonthLastTime(today));
+//		System.out.println("========================================================================");
+//		System.out.println(intervalSeconds(start, end));
+//		System.out.println(intervalSeconds(startTime, endTime));
+//		System.out.println("========================================================================");
+//		System.out.println(handleDateTimeByMonth(today, 0,-2,1));
+//		System.out.println(handleDateTimeByMonth(now, 0,-2,1));
+//		System.out.println("========================================================================");
+//		List<String> months = handleMonths(1, true);
+//		System.out.println(months);
+//		Map<Integer, List<String>> map = handleQuarters(1, true);
+//		System.out.println(map);
+		String dateTime = "2018";
+		String format="yyyy";
+		LocalDateTime date = formatLocalDateTime(dateTime, format);
+		System.out.println(date);
 	}
 }

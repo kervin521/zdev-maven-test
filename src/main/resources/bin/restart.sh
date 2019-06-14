@@ -27,19 +27,6 @@ function ipconf() {
   echo ${server_ip}
 }
 
-
-function ipconf() {
-    case "`uname`" in
-        Darwin)
-         server_ip=`echo "show State:/Network/Global/IPv4" | scutil | grep PrimaryInterface | awk '{print $3}' | xargs ifconfig | grep inet | grep -v inet6 | awk '{print $2}'`
-         ;;
-        *)
-         server_ip=`ip route get 1 | awk '{print $NF;exit}'`
-         ;;
-  esac
-  echo ${server_ip}
-}
-
 function jenv(){
 	eval A='('$*')'
 	for i in ${!A[*]}
