@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 项目: SF_Common
- * 描述: FTP文件下载功能
+ * @project SF_Common
+ * @description FTP文件下载功能
  * 作者: zhangyi183790
  * 时间: 2019年3月19日 上午10:35:50
  * 版本: v1.0
@@ -29,7 +29,7 @@ public class FTPUtils {
 	private static FTPClient client = null;
 
 	/**
-	 * 描述: FTP打开连接
+	 * @description FTP打开连接
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 上午10:36:14
 	 * 参数: (参数列表)
@@ -65,7 +65,7 @@ public class FTPUtils {
 	}
 
 	/**
-	 * 描述: FTP下载文件
+	 * @description FTP下载文件
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 上午10:36:14
 	 * 参数: (参数列表)
@@ -91,7 +91,7 @@ public class FTPUtils {
 	}
 
 	/**
-	 * 描述: FTP下载文件
+	 * @description FTP下载文件
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 上午10:36:14
 	 * 参数: (参数列表)
@@ -114,7 +114,7 @@ public class FTPUtils {
 	}
 
 	/**
-	 * 描述: FTP下载文件
+	 * @description FTP下载文件
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 上午10:36:14
 	 * 参数: (参数列表)
@@ -150,7 +150,7 @@ public class FTPUtils {
 	}
 
 	/**
-	 * 描述: FTP关闭连接
+	 * @description FTP关闭连接
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 上午10:36:14
 	 * 参数: (参数列表)
@@ -174,7 +174,7 @@ public class FTPUtils {
 	public static final Pattern pattern = Pattern.compile("[^\\x00-\\xff]");
 
 	/**
-	 * 描述: 匹配双字节字符（汉字、中文标点符号等）
+	 * @description 匹配双字节字符（汉字、中文标点符号等）
 	 * 作者: ZhangYi
 	 * 时间: 2019年3月19日 下午2:22:50
 	 * 参数: (参数列表)

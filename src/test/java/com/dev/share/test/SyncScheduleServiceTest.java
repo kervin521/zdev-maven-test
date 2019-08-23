@@ -10,13 +10,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * 
- * 项目: SF_Equipment_Diagnosis
- * 描述: 设备同步计划
+ * @project SF_Equipment_Diagnosis
+ * @description 设备同步计划
  * 
  * @author ZhangYi
  * @date 2019-04-02 17:04:54
- *       版本: v1.0
- *       JDK: 1.8
+ * @version v1.0
+ * @Jdk  1.8
  */
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -26,7 +26,7 @@ public class SyncScheduleServiceTest {
 	private static ThreadLocal<LocalDateTime> local = new ThreadLocal<LocalDateTime>();
 
 //	/**
-//	 * 描述: 诊断信息采集
+//	 * @description 诊断信息采集
 //	 * 
 //	 * @author ZhangYi
 //	 * @date 2019-04-02 17:05:26
@@ -47,7 +47,7 @@ public class SyncScheduleServiceTest {
 //		local.set(LocalDateTime.now());
 //	}
 	/**
-	 * 描述: 诊断信息采集
+	 * @description 诊断信息采集
 	 * 
 	 * @author ZhangYi
 	 * @date 2019-04-02 17:05:26
@@ -68,7 +68,7 @@ public class SyncScheduleServiceTest {
 		local.set(LocalDateTime.now());
 	}
 //	/**
-//	 * 描述: 诊断信息采集
+//	 * @description 诊断信息采集
 //	 * 
 //	 * @author ZhangYi
 //	 * @date 2019-04-02 17:05:26

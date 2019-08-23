@@ -3118,7 +3118,48 @@ public class DateUtils {
 		}
 		return map;
 	}
-
+	/**
+	 * @description 估算时间差
+	 * @author ZhangYi
+	 * @date 2019/08/23 10:13:18
+	 * @param start 开始毫秒数
+	 * @param end  结束毫秒数
+	 * @return
+	 */
+	public static String time(long start,long end) {
+        String result = "";
+        if(start<0||end<0) {
+            return result; 
+        }
+        boolean flag = (end>=start);
+        long diff = Math.abs(end-start);
+        long millis = diff%MILLIS_PER_SECOND;
+        result = millis<1?"":(millis + "ms");
+        diff = diff/MILLIS_PER_SECOND;
+        if(diff==0) {
+            return result;
+        }
+        long second = diff%SECONDS_PER_MINUTE;
+        result = (second<1?"":second + "s ")+result;
+        diff = diff/SECONDS_PER_MINUTE;
+        if(diff==0) {
+            return result;
+        }
+        long minute = diff%MINUTES_PER_HOUR;
+        result = (minute<1?"":minute + "m ")+result;
+        diff = diff/MINUTES_PER_HOUR;
+        if(diff==0) {
+            return result;
+        }
+        long hour = diff%HOURS_PER_DAY;
+        result = (hour<1?"":hour + "h ")+result;
+        diff = diff/HOURS_PER_DAY;
+        if(diff==0) {
+            return result;
+        }
+        result = (diff<1?"":diff + "d ")+result;
+        return (flag?"":"-")+result;
+    }
 	public static void main(String[] args) {
 		// String date = "1970-01-01 00:00:00";
 		// String time = "1461032462000";
@@ -3148,10 +3189,11 @@ public class DateUtils {
 //		System.out.println(dateToLocalDate(today.getTime()));
 //		System.out.println(dateToDateTime(today.getTime()));
 //		System.out.println("===================================================================");
-//		String start_time = "2018-03-02 12:59:00";
-//		String end_time = "2018-03-02 12:59:59";
-//		Date start = formatDateTime(start_time);
-//		Date end = formatDateTime(end_time);
+		String start_time = "2018-03-27 13:59:59.001";
+		String end_time = "2018-03-29 12:57:57.002";
+		Date start = formatDateTime(start_time);
+		Date end = formatDateTime(end_time);
+		System.out.println(time(start.getTime(), end.getTime()));
 //		LocalDateTime startTime = formatLocalDateTime(start_time);
 //		LocalDateTime endTime = formatLocalDateTime(end_time);
 //		System.out.println("========================================================================");

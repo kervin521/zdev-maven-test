@@ -38,7 +38,7 @@ public class CipherUtils {// decrypt encrypt
 	}
 
 	/**
-	 * 描述: RSA生成公钥私钥
+	 * @description RSA生成公钥私钥
 	 * 作者:ZhangYi
 	 * 时间:2019年1月2日 下午3:26:16
 	 * 参数：(参数列表)
@@ -59,7 +59,7 @@ public class CipherUtils {// decrypt encrypt
 	}
 
 	/**
-	 * 描述: ECC生成公钥私钥
+	 * @description ECC生成公钥私钥
 	 * 作者:ZhangYi
 	 * 时间:2019年1月2日 下午3:26:16
 	 * 参数：(参数列表)
@@ -79,7 +79,7 @@ public class CipherUtils {// decrypt encrypt
 	}
 
 	/**
-	 * 描述: HMAC生成秘钥
+	 * @description HMAC生成秘钥
 	 * 作者:ZhangYi
 	 * 时间:2019年1月2日 下午3:26:16
 	 * 参数：(参数列表)

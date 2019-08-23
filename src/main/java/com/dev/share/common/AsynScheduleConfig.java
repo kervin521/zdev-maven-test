@@ -14,8 +14,8 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 /**
- * 项目: SF_Equipment_Diagnosis
- * 描述: 系统同步异步计划配置
+ * @project SF_Equipment_Diagnosis
+ * @description 系统同步异步计划配置
  * xmlns:task="http://www.springframework.org/schema/task"
  * <task:executor id="executor" pool-size="5"/>
  * <task:scheduler id="scheduler" pool-size="10"/>
@@ -23,8 +23,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  * 
  * @author ZhangYi
  * @date 2019-04-03 13:48:43
- *       版本: v1.0
- *       JDK: 1.8
+ * @version v1.0
+ * @Jdk  1.8
  */
 @Configuration
 public class AsynScheduleConfig extends AsyncConfigurerSupport implements SchedulingConfigurer {

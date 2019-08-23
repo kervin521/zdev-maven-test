@@ -66,7 +66,7 @@ public class ClassTest {
 		}
 
 		/**
-		 * 描述: 上行监听服务
+		 * @description 上行监听服务
 		 * 作者:ZhangYi
 		 * 时间:2019年1月28日 下午5:03:28
 		 * 参数：(参数列表)
@@ -82,7 +82,7 @@ public class ClassTest {
 		}
 
 		/**
-		 * 描述: 消息回执
+		 * @description 消息回执
 		 * 作者:ZhangYi
 		 * 时间:2019年1月28日 下午6:27:24
 		 * 参数：(参数列表)
@@ -108,7 +108,7 @@ public class ClassTest {
 		}
 
 		/**
-		 * 描述: 提交消息
+		 * @description 提交消息
 		 * 作者:ZhangYi
 		 * 时间:2019年1月28日 下午6:26:55
 		 * 参数：(参数列表)
@@ -121,7 +121,7 @@ public class ClassTest {
 		}
 
 		/**
-		 * 描述: SGIP客户端检查并绑定或重连
+		 * @description SGIP客户端检查并绑定或重连
 		 * 作者:ZhangYi
 		 * 时间:2019年1月28日 下午5:01:45
 		 * 参数：(参数列表)
@@ -134,7 +134,7 @@ public class ClassTest {
 		}
 
 		/**
-		 * 描述: SGIP客户端心跳
+		 * @description SGIP客户端心跳
 		 * 作者:ZhangYi
 		 * 时间:2019年1月28日 下午5:01:45
 		 * 参数：(参数列表)

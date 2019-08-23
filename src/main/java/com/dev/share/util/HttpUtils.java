@@ -49,6 +49,7 @@ import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -62,6 +63,7 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -85,7 +87,7 @@ public class HttpUtils {
 	/**
 	 * http客户端
 	 */
-	private static CloseableHttpClient client = HttpClients.createDefault();
+	private static CloseableHttpClient client = config().build();
 	/**
 	 * HTTP协议:http://
 	 */
@@ -122,7 +124,18 @@ public class HttpUtils {
 	 * Trace请求
 	 */
 	public final static String METHOD_TRACE = "TRACE";
-
+	
+	/**
+	 * @description 初始化配置
+	 * @author ZhangYi
+	 * @date 2019/08/19 10:59:13
+	 * @return
+	 */
+	private static HttpClientBuilder config() {
+	    HttpClientBuilder builder = HttpClients.custom();
+	    builder.setDefaultRequestConfig(RequestConfig.DEFAULT);
+	    return builder;
+	}
 	/**
 	 * @param proxyHost 代理地址
 	 * @param port      代理端口
@@ -234,6 +247,7 @@ public class HttpUtils {
 	public static boolean checkConnection(String url, String auth) {
 		boolean flag = false;
 		try {
+			registerProtocol(url);
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setConnectTimeout(5 * 1000);
 			if (auth != null && !"".equals(auth)) {
@@ -264,13 +278,14 @@ public class HttpUtils {
 		boolean flag = false;
 		HttpResponse response = null;
 		try {
+			registerProtocol(url);
 			HttpRequestBase http = new HttpHead(url);
 			response = client.execute(http);
 			if (response != null && (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK || response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED)) {
 				flag = true;
 			}
 		} catch (Exception e) {
-			logger.error("--Server Connect Error !", e);
+			logger.error("--Server Connect{url:"+url+"} Error !", e);
 		} finally {
 			HttpClientUtils.closeQuietly(response);
 		}
@@ -295,6 +310,9 @@ public class HttpUtils {
 					if (StringUtils.isNotBlank(builder.toString())) {
 						builder.append("&");
 					}
+					if(value instanceof String) {
+						value = encode((String)value);
+					}
 					builder.append(key + "=" + value);
 				}
 			} else if (params instanceof Collection) {
@@ -311,6 +329,9 @@ public class HttpUtils {
 							Object value = entity.getValue();
 							if (StringUtils.isNotBlank(builder.toString())) {
 								builder.append("&");
+							}
+							if(value instanceof String) {
+								value = encode((String)value);
 							}
 							builder.append(key + "=" + value);
 						}
@@ -415,6 +436,7 @@ public class HttpUtils {
 			if (!(method.equalsIgnoreCase(METHOD_POST) || method.equalsIgnoreCase(METHOD_PUT))) {
 				url += (url.contains("?") ? (url.endsWith("&") ? "" : "&") : "?") + param;
 			}
+			registerProtocol(url);
 			HttpRequestBase http = new HttpGet(url);
 			if (method.equalsIgnoreCase(METHOD_POST)) {
 				http = new HttpPost(url);
@@ -459,7 +481,7 @@ public class HttpUtils {
 				result = JSON.parseObject(result).toJSONString();
 			}
 		} catch (Exception e) {
-			logger.error("--http request error !", e);
+			logger.error("--http request error {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", e);
 			result = e.getMessage();
 		} finally {
 			HttpClientUtils.closeQuietly(response);
@@ -488,6 +510,7 @@ public class HttpUtils {
 	public static String urlRequest(String url, String method, String param, Map<String, String> headers, String auth) {
 		String result = null;
 		try {
+			registerProtocol(url);
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setConnectTimeout(60 * 1000);
 			connection.setRequestMethod(method.toUpperCase());
@@ -550,7 +573,7 @@ public class HttpUtils {
 			}
 			connection.disconnect();
 		} catch (Exception e) {
-			logger.error("--http request error !", e);
+			logger.error("--http request error {url:"+url+",method:"+method+",params:"+param+"}!", e);
 		}
 		return result;
 	}
@@ -573,7 +596,7 @@ public class HttpUtils {
 			if (matchChinese(url)) {
 				charset = "GBK";
 			}
-
+			registerProtocol(url);
 			HttpRequestBase http = new HttpGet(url);
 			if (method.equalsIgnoreCase(METHOD_POST)) {
 				http = new HttpPost(url);
@@ -598,20 +621,18 @@ public class HttpUtils {
 //				in = new ByteArrayInputStream(JSON.parseObject(result).toJSONString().getBytes());
 				logger.error("HTTP|HTTPS download error:{}", message);
 			}
-		} catch (IOException e) {
-			logger.error("HTTP|HTTPS download error", e);
+		} catch (Exception e) {
+			logger.error("HTTP|HTTPS download error{url:"+url+",method:"+method+",params:"+param+"}", e);
 		}
 		return in;
 	}
 
 	/**
-	 * <pre>
 	 * 描述: URL编码
-	 * &#64;author yi.zhang
+	 * @author yi.zhang
 	 * 时间: 2017年9月15日 下午3:33:38
-	 * &#64;param target 目标字符串
-	 * &#64;return
-	 * </pre>
+	 * @param target 目标字符串
+	 * @return
 	 */
 	public static String encode(String target) {
 		String result = target;
@@ -624,13 +645,11 @@ public class HttpUtils {
 	}
 
 	/**
-	 * <pre>
 	 * 描述: URL解码
-	 * &#64;author yi.zhang
+	 * @author yi.zhang
 	 * 时间: 2017年9月15日 下午3:33:38
-	 * &#64;param target 目标字符串
-	 * &#64;return
-	 * </pre>
+	 * @param target 目标字符串
+	 * @return
 	 */
 	public static String decode(String target) {
 		String result = target;
@@ -674,7 +693,23 @@ public class HttpUtils {
 		for (Map.Entry<String, NetworkInterface> entry : networks.entrySet()) {
 			String host = entry.getKey();
 			NetworkInterface network = entry.getValue();
-			System.out.println("host:" + host + ",name:" + network.getName() + ",displayName:" + network.getDisplayName() + ",Loopback:" + network.isLoopback() + ",PointToPoint:" + network.isPointToPoint() + ",Up:" + network.isUp() + ",Virtual:" + network.isVirtual() + ",Index:" + network.getIndex() + ",MTU:" + network.getMTU());
+			// 网卡名称
+			String netname = System.getProperty("network.name");
+			if(StringUtils.isBlank(netname)) {
+			    netname = System.getenv("network.name");
+			}
+			if(StringUtils.isBlank(netname)) {
+			    netname = System.getProperty("NETWORK_NAME");
+			}
+			if(StringUtils.isBlank(netname)) {
+			    netname = System.getenv("NETWORK_NAME");
+			}
+			logger.info("==>>>netname:{},host:{},name:{},displayName:{}",netname,host,network.getName(),network.getDisplayName());
+			if(StringUtils.isNotBlank(netname)&&(netname.equalsIgnoreCase(network.getName())||netname.equalsIgnoreCase(network.getDisplayName()))) {
+			    local = host;
+			    logger.info("++>>>netname:{},host:{},name:{},displayName:{}",netname,host,network.getName(),network.getDisplayName());
+			    break;
+			}
 			if (network.isLoopback() || network.isVirtual()) {
 				continue;
 			}
@@ -691,11 +726,10 @@ public class HttpUtils {
 			if (StringUtils.isNotBlank(network.getDisplayName()) && network.getDisplayName().toLowerCase().contains("loopback")) {
 				continue;
 			}
-			return host;
+			local = host;
 		}
 		return local;
 	}
-
 	/**
 	 * 
 	 * 描述: 获取主机所有地址对应网卡信息
@@ -708,23 +742,24 @@ public class HttpUtils {
 		Map<String, NetworkInterface> networks = Maps.newHashMap();
 		try {
 			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-			NetworkInterface networkInterface;
+			NetworkInterface network;
 			Enumeration<InetAddress> inetAddresses;
 			InetAddress inetAddress;
-			String ip;
+			String host;
 			while (networkInterfaces.hasMoreElements()) {
-				networkInterface = networkInterfaces.nextElement();
-				inetAddresses = networkInterface.getInetAddresses();
+			    network = networkInterfaces.nextElement();
+				inetAddresses = network.getInetAddresses();
 				while (inetAddresses.hasMoreElements()) {
 					inetAddress = inetAddresses.nextElement();
-					if (inetAddress != null && inetAddress instanceof Inet4Address) { // IPV4
-						ip = inetAddress.getHostAddress();
-						networks.put(ip, networkInterface);
+					if (inetAddress instanceof Inet4Address) { // IPV4
+					    host = inetAddress.getHostAddress();
+						networks.put(host, network);
+						logger.info("host:{},name:{},displayName:{},Loopback:{},PointToPoint:{},Up:{},Virtual:{},Index:{},MTU:{}",host,network.getName(),network.getDisplayName(),network.isLoopback(),network.isPointToPoint(),network.isUp(),network.isVirtual(),network.getIndex(),network.getMTU());
 					}
 				}
 			}
 		} catch (SocketException e) {
-			e.printStackTrace();
+			logger.error("--Get networks Error!",e);
 		}
 		return networks;
 	}

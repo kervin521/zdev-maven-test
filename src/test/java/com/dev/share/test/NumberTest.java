@@ -26,10 +26,11 @@ public class NumberTest {
 //		System.out.println(0%1);
 //		System.out.println(1%1);
 //		System.out.println(2%1);
-//		System.out.println(Integer.MAX_VALUE);;
 		System.out.println("===============================================================================");
-		for (int i = 1; i <= 12; i++) {
-			System.out.println(i + "----" + Double.valueOf((i - 1) / 3 + 1).intValue());
-		}
+		System.out.println(Integer.MAX_VALUE);;
+		System.out.println(Long.MAX_VALUE);
+//		for (int i = 1; i <= 12; i++) {
+//			System.out.println(i + "----" + Double.valueOf((i - 1) / 3 + 1).intValue());
+//		}
 	}
 }

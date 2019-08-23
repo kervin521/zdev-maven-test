@@ -1,8 +1,8 @@
 package com.dev.share.ThreadPool;
 
 /**
- * 项目: emgw-common
- * 描述: 多线程处理增加线程编号
+ * @project emgw-common
+ * @description 多线程处理增加线程编号
  * 作者: ZhangYi
  * 时间: 2019年1月10日 上午10:29:31
  * 版本: v1.0

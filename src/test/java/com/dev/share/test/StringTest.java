@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -76,6 +77,8 @@ public class StringTest {
 		System.out.println(Pattern.compile("[\u2E80-\u9FFF]").matcher(fileName).find());
 		System.out.println(Pattern.compile("[\u4e00-\u9fa5]").matcher(fileName).find());
 		System.out.println(Pattern.compile("[^\\x00-\\xff]").matcher(fileName).find());
+		String[] aa= {"aa"};
+		List<String> list = Arrays.asList(aa);
 	}
 
 }

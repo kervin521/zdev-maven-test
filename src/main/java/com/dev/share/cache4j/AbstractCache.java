@@ -15,7 +15,7 @@ import net.sf.cache4j.impl.CacheConfigImpl;
 
 /***
  * 项目:emgw-core
- * 描述: 二级缓存
+ * @description 二级缓存
  * 缓存配置参数：
  * cacheId 缓存ID
  * cacheDesc 描述

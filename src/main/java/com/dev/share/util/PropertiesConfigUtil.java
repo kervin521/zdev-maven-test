@@ -7,8 +7,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
 /**
- * 项目: emgw-common
- * 描述: Properties文件操作(此性能比较高,支持动态set或get,可持久化文件)
+ * @project emgw-common
+ * @description Properties文件操作(此性能比较高,支持动态set或get,可持久化文件)
  * 备注: 不支持[classpath:]方式
  * 作者: ZhangYi
  * 时间: 2019年1月16日 下午3:04:00
@@ -21,7 +21,7 @@ public class PropertiesConfigUtil {
 	private static ConcurrentHashMap<String, PropertiesConfiguration> map = new ConcurrentHashMap<String, PropertiesConfiguration>();
 
 	/**
-	 * 描述: 加载文件
+	 * @description 加载文件
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:20:51
 	 * 参数: (参数列表)
@@ -45,7 +45,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 获取配置文件
+	 * @description 获取配置文件
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:43:30
 	 * 参数: (参数列表)
@@ -64,7 +64,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 修改文件值
+	 * @description 修改文件值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:25:54
 	 * 参数: (参数列表)
@@ -88,7 +88,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 修改文件值
+	 * @description 修改文件值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:25:54
 	 * 参数: (参数列表)
@@ -113,7 +113,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 获取属性值
+	 * @description 获取属性值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:35:52
 	 * 参数: (参数列表)
@@ -135,7 +135,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 获取指定文件属性值
+	 * @description 获取指定文件属性值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:35:52
 	 * 参数: (参数列表)
@@ -153,7 +153,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 获取属性值
+	 * @description 获取属性值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:35:52
 	 * 参数: (参数列表)
@@ -175,7 +175,7 @@ public class PropertiesConfigUtil {
 	}
 
 	/**
-	 * 描述: 获取指定文件属性值
+	 * @description 获取指定文件属性值
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月16日 下午3:35:52
 	 * 参数: (参数列表)

@@ -1,0 +1,38 @@
+rexray:
+   logLevel: info
+libstorage:
+   logging:
+      level: info
+      httpRequests: true
+      httpResponses: true
+   integration:
+      volume:
+         operations:
+            create:
+               disable: false
+               default:
+                  size: 1
+            remove:
+               disable: false
+               force: true
+            mount:
+               preempt: true
+               rootPath: /opt/ceph/rbd2
+            unmount:
+               ignoreUsedCount: false
+            path:
+               cache:
+                  enabled: true
+                  async: true
+   service: rbd
+   server:
+      parseRequestOpts: true
+      tasks:
+         logTimeout: 10m
+      services:
+         rbd:
+            driver: rbd
+            rbd:
+               defaultPool: rbd
+               testModule: true
+               volumePath: /opt/ceph/rbd2

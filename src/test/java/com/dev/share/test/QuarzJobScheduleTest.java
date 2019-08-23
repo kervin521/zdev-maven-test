@@ -15,13 +15,13 @@ import org.springframework.util.ResourceUtils;
 import com.google.common.collect.Maps;
 
 /**
- * 项目: SF_Equipment_Diagnosis
+ * @project SF_Equipment_Diagnosis
  * 描述:
  * 
  * @author ZhangYi
  * @date 2019-04-11 14:25:42
- *       版本: v1.0
- *       JDK: 1.8
+ * @version v1.0
+ * @Jdk  1.8
  */
 @Component
 public class QuarzJobScheduleTest {

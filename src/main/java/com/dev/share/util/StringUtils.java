@@ -71,7 +71,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 	}
 
 	/**
-	 * 描述: GZip压缩
+	 * @description GZip压缩
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月12日 上午9:17:15
 	 * 参数: (参数列表)
@@ -108,7 +108,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 	}
 
 	/**
-	 * 描述: GZip压缩文本解压
+	 * @description GZip压缩文本解压
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月12日 上午9:17:15
 	 * 参数: (参数列表)

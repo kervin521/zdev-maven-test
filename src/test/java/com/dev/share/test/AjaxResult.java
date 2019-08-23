@@ -104,8 +104,8 @@ public class AjaxResult {
 	}
 
 	/**
-	 * 项目: SF_Common
-	 * 描述: ajax响应重构
+	 * @project SF_Common
+	 * @description ajax响应重构
 	 * 
 	 * @author ZhangYi
 	 *         时间: 2019年3月13日 下午3:22:41

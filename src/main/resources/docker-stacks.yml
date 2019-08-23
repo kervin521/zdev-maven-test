@@ -1,0 +1,413 @@
+version: '3.7'
+services:
+   mqtt-broker:
+      image: 172.21.32.31:5000/eclipse-mosquitto:1.4.12
+      restart: always
+      ports:
+      - 1883:1883
+      deploy:
+         replicas: 1
+   mysql:
+      image: 172.21.32.31:5000/mysql-canal:5.7.22
+      container_name: mysql
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=SqlPwd1@
+      volumes:
+      - mysql:/var/lib/mysql
+      ports:
+      - 3306:3306
+      deploy:
+         replicas: 1
+   mysql3307:
+      image: 172.21.32.31:5000/mysql:5.7.22
+      container_name: mysql3307
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=MysqlPwd1@
+      volumes:
+      - mysql3307:/var/lib/mysql
+      ports:
+      - 3307:3306
+      deploy:
+         replicas: 1
+   phpmyadmin:
+      image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
+      container_name: phpmyadmin
+      restart: always
+      links:
+      - mysql
+      environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      ports:
+      - 30680:80
+      deploy:
+         replicas: 1
+   phpmyadmin3307:
+      image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
+      container_name: phpmyadmin3307
+      restart: always
+      links:
+      - mysql3307
+      environment:
+      - PMA_HOST=mysql3307
+      - PMA_PORT=3306
+      ports:
+      - 30780:80
+      deploy:
+         replicas: 1
+   redis:
+      image: 172.21.32.31:5000/redis:4.0.9-alpine
+      container_name: redis
+      restart: always
+      volumes:
+      - redis:/data
+      ports:
+      - 6379:6379
+      deploy:
+         replicas: 1
+   neo4j:
+      image: 172.21.32.31:5000/neo4j:3.4
+      container_name: neo4j
+      restart: always
+      volumes:
+      - neo4j:/data
+      ports:
+      - 7687:7687
+      - 7474:7474
+      deploy:
+         replicas: 1
+   influxdb:
+      image: 172.21.32.31:5000/influxdb:1.5.4-alpine
+      container_name: influxdb
+      restart: always
+      volumes:
+      - influxdb:/var/lib/influxdb
+      ports:
+      - 8086:8086
+      deploy:
+         replicas: 1
+   canal-server:
+      image: 172.21.32.31:5000/canal-server
+      container_name: canal-server
+      restart: always
+      volumes:
+      - canal-server:/home/admin/canal-server/conf
+      ports:
+      - 11111:11111
+      links:
+      - mysql
+      - mysql3307
+      deploy:
+         replicas: 1
+   xxl-job-admin:
+      image: 172.21.32.31:5000/xxl-job-admin:2.1.0
+      container_name: xxl-job-admin
+      restart: always
+      volumes:
+      - xxl-job-admin:/opt/deploy/xxl-job-admin/config
+      ports:
+      - 7072:7072
+      links:
+      - mysql3307
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   node-red:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      container_name: node-red-01
+      restart: always
+      privileged: true
+      volumes:
+      - node-red:/data
+      ports:
+      - 18800:1880
+      deploy:
+         replicas: 3
+   registry-ui:
+      image: 172.21.32.31:5000/jc21/registry-ui:2.0.2
+      container_name: registry-ui
+      restart: always
+      environment:
+      - REGISTRY_HOST=172.21.32.31:5000
+      ports:
+      - 30080:80
+      deploy:
+         replicas: 1
+   portainer:
+      image: 172.21.32.31:5000/portainer/portainer
+      container_name: portainer
+      restart: always
+      volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      ports:
+      - 9000:9000
+      - 2375:2375
+      deploy:
+         replicas: 1
+   sf-modelmanager-service:
+      image: 172.21.32.31:5000/sf-modelmanager-service:1.0.0
+      container_name: sf-modelmanager-service
+      restart: always
+      volumes:
+      - sf-modelmanager-service:/opt/deploy/sf-modelmanager-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8170:8170
+      links:
+      - neo4j
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-gatewayproxy-service:
+      image: 172.21.32.31:5000/sf-gatewayproxy-service:1.0.0
+      container_name: sf-gatewayproxy-service
+      restart: always
+      volumes:
+      - sf-gatewayproxy-service:/opt/deploy/sf-gatewayproxy-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8177:8177
+      links:
+      - neo4j
+      - redis
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-history-service:
+      image: 172.21.32.31:5000/sf-history-service:1.0.0
+      container_name: sf-history-service
+      restart: always
+      volumes:
+      - sf-history-service:/opt/deploy/sf-history-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8140:8140
+      links:
+      - influxdb
+      - redis
+      - neo4j
+      - sf-modelmanager-service
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-realtime-service:
+      image: 172.21.32.31:5000/sf-realtime-service:1.0.0
+      container_name: sf-realtime-service
+      restart: always
+      volumes:
+      - sf-realtime-service:/opt/deploy/sf-realtime-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8172:8172
+      links:
+      - redis
+      - neo4j
+      - mysql
+      - canal-server
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-manager-service:
+      image: 172.21.32.31:5000/target-manager-service:1.0.0
+      container_name: target-manager-service
+      restart: always
+      volumes:
+      - target-manager-service:/opt/deploy/target-manager-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8631:8631
+      links:
+      - mysql
+      - sf-modelmanager-service
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-calculate-service:
+      image: 172.21.32.31:5000/target-calculate-service:1.0.0
+      container_name: target-calculate-service
+      restart: always
+      volumes:
+      - target-calculate-service:/opt/deploy/target-calculate-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8731:8731
+      - 65534:65534
+      links:
+      - mysql
+      - mysql3307
+      - sf-realtime-service
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-calculate-service2:
+      image: 172.21.32.31:5000/target-calculate-service:1.0.0
+      restart: always
+      volumes:
+      - target-calculate-service2:/opt/deploy/target-calculate-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9731:8731
+      - 55534:65534
+      links:
+      - mysql
+      - mysql3307
+      - sf-realtime-service
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   system-authority-service:
+      image: 172.21.32.31:5000/authority:1.0.0
+      restart: always
+      links:
+      - redis
+      - postgresdb
+      volumes:
+      - system-authority-service:/opt/deploy/authority/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8551:8551
+      deploy:
+         replicas: 1
+   system-manager-service:
+      image: 172.21.32.31:5000/system-manager:1.0.0
+      restart: always
+      links:
+      - postgresdb
+      volumes:
+      - system-manager-service:/opt/deploy/system-manager/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8571:8571
+      deploy:
+         replicas: 1
+   dbs-decision-system-web:
+      image: 172.21.32.31:5000/dbs-decision-system-web:1.0.0
+      restart: always
+      volumes:
+      - dbs-decision-system-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8080:80
+      deploy:
+         replicas: 1
+   dbs-cockpit-web:
+      image: 172.21.32.31:5000/dbs-cockpit-web:1.0.0
+      restart: always
+      volumes:
+      - dbs-cockpit-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 7070:80
+      deploy:
+         replicas: 1
+   target-manager-web:
+      image: 172.21.32.31:5000/target-manager-web:1.0.0
+      restart: always
+      volumes:
+      - target-manager-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9090:80
+      deploy:
+         replicas: 1
+   system-authority-web:
+      image: 172.21.32.31:5000/authority-web:1.0.0
+      restart: always
+      volumes:
+      - system-authority-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8550:80
+      deploy:
+         replicas: 1
+   system-manager-web:
+      image: 172.21.32.31:5000/system-manager-web:1.0.0
+      restart: always
+      volumes:
+      - system-manager-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8570:80
+      deploy:
+         replicas: 1
+volumes:
+   mysql:
+      driver: rexray/rbd:latest
+   mysql3307:
+      driver: rexray/rbd:latest
+   redis:
+      driver: rexray/rbd:latest
+   neo4j:
+      driver: rexray/rbd:latest
+   influxdb:
+      driver: rexray/rbd:latest
+   canal-server:
+      driver: rexray/rbd:latest
+   xxl-job-admin:
+      driver: rexray/rbd:latest
+   node-red:
+      driver: rexray/rbd:latest
+   sf-modelmanager-service:
+      driver: rexray/rbd:latest
+   sf-gatewayproxy-service:
+      driver: rexray/rbd:latest
+   sf-history-service:
+      driver: rexray/rbd:latest
+   sf-realtime-service:
+      driver: rexray/rbd:latest
+   target-manager-service:
+      driver: rexray/rbd:latest
+   target-calculate-service:
+      driver: rexray/rbd:latest
+   target-calculate-service2:
+      driver: rexray/rbd:latest
+   system-authority-service:
+      driver: rexray/rbd:latest
+   system-manager-service:
+      driver: rexray/rbd:latest
+   dbs-decision-system-web:
+      driver: rexray/rbd:latest
+   dbs-cockpit-web:
+      driver: rexray/rbd:latest
+   target-manager-web:
+      driver: rexray/rbd:latest
+   system-authority-web:
+      driver: rexray/rbd:latest
+   system-manager-web:
+      driver: rexray/rbd:latest

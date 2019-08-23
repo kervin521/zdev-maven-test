@@ -21,7 +21,7 @@ public class HanlpSimilarty {
 	}
 
 	/**
-	 * 描述: 文本相似度算法
+	 * @description 文本相似度算法
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月11日 下午2:03:04
 	 * 参数: (参数列表)
@@ -55,7 +55,7 @@ public class HanlpSimilarty {
 	}
 
 	/**
-	 * 描述: 文本相似度算法
+	 * @description 文本相似度算法
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月11日 下午2:03:04
 	 * 参数: (参数列表)
@@ -94,7 +94,7 @@ public class HanlpSimilarty {
 	}
 
 	/**
-	 * 描述: 词频率
+	 * @description 词频率
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月11日 下午2:03:53
 	 * 参数: (参数列表)
@@ -112,7 +112,7 @@ public class HanlpSimilarty {
 	}
 
 	/**
-	 * 描述: 合并分词
+	 * @description 合并分词
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月11日 下午2:04:33
 	 * 参数: (参数列表)
@@ -129,7 +129,7 @@ public class HanlpSimilarty {
 	}
 
 	/**
-	 * 描述: HanLP分词
+	 * @description HanLP分词
 	 * 作者: ZhangYi
 	 * 时间: 2019年1月11日 下午2:06:37
 	 * 参数: (参数列表)

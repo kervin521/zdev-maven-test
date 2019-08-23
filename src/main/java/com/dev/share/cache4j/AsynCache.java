@@ -6,8 +6,8 @@
 //import net.sf.cache4j.impl.UnSynchronizedCache;
 //
 ///***
-//  * 项目:emgw-core
-//  * 描述: 异步二级缓存
+// * @project emgw-core
+// * @description 异步二级缓存
 //  * 作者:ZhangYi
 //  * 时间:2019年1月3日 下午2:52:08
 //  * 版本:v1.0

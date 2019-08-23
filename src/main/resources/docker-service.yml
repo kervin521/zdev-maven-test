@@ -1,0 +1,99 @@
+version: '3.7'
+services:
+   mqtt-broker:
+      image: 172.21.32.31:5000/eclipse-mosquitto:1.4.12
+      restart: always
+      ports:
+      - 1883:1883
+      deploy:
+         replicas: 1
+   mysql:
+      image: 172.21.32.31:5000/mysql-canal:5.7.22
+      container_name: mysql
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=SqlPwd1@
+      volumes:
+      - mysql:/var/lib/mysql
+      ports:
+      - 3306:3306
+      deploy:
+         replicas: 1
+   mysql3307:
+      image: 172.21.32.31:5000/mysql:5.7.22
+      container_name: mysql3307
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=MysqlPwd1@
+      volumes:
+      - mysql3307:/var/lib/mysql
+      ports:
+      - 3307:3306
+      deploy:
+         replicas: 1
+   phpmyadmin:
+      image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
+      container_name: phpmyadmin
+      restart: always
+      links:
+      - mysql
+      environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      ports:
+      - 30680:80
+      deploy:
+         replicas: 1
+   phpmyadmin3307:
+      image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
+      container_name: phpmyadmin3307
+      restart: always
+      links:
+      - mysql3307
+      environment:
+      - PMA_HOST=mysql3307
+      - PMA_PORT=3306
+      ports:
+      - 30780:80
+      deploy:
+         replicas: 1
+   redis:
+      image: 172.21.32.31:5000/redis:4.0.9-alpine
+      container_name: redis
+      restart: always
+      volumes:
+      - redis:/data
+      ports:
+      - 6379:6379
+      deploy:
+         replicas: 1
+   neo4j:
+      image: 172.21.32.31:5000/neo4j:3.4
+      container_name: neo4j
+      restart: always
+      volumes:
+      - neo4j:/data
+      ports:
+      - 7687:7687
+      - 7474:7474
+      deploy:
+         replicas: 1
+   influxdb:
+      image: 172.21.32.31:5000/influxdb:1.5.4-alpine
+      container_name: influxdb
+      restart: always
+      volumes:
+      - influxdb:/var/lib/influxdb
+      ports:
+      - 8086:8086
+      deploy:
+         replicas: 1
+volumes:
+   mysql: /home/deploy/config/mysql/data
+   mysql3307: /home/deploy/config/mysql3307/data
+   redis: /home/deploy/config/redis-data
+   neo4j: /home/deploy/config/neo4j_data
+   influxdb: /home/deploy/config/influxdb
+   node-red: /home/deploy/config/node-red-data-01

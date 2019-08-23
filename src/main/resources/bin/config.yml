@@ -1,0 +1,10 @@
+rexray:
+   logLevel: info
+libstorage:
+   logging:
+      level: info
+      httpRequests: true
+      httpResponses: true
+   service: rbd
+rbd:
+   defaultPool: rbd

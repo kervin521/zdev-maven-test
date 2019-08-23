@@ -1,0 +1,263 @@
+version: '3.7'
+services:
+   canal-server:
+      image: 172.21.32.31:5000/canal-server
+      container_name: canal-server
+      restart: always
+      volumes:
+      - canal-server:/home/admin/canal-server/conf
+      ports:
+      - 11111:11111
+      deploy:
+         replicas: 1
+   xxl-job-admin:
+      image: 172.21.32.31:5000/xxl-job-admin:2.1.0
+      container_name: xxl-job-admin
+      restart: always
+      volumes:
+      - xxl-job-admin:/opt/deploy/xxl-job-admin/config
+      ports:
+      - 7072:7072
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+         
+   registry-ui:
+      image: 172.21.32.31:5000/jc21/registry-ui:2.0.2
+      container_name: registry-ui
+      restart: always
+      environment:
+      - REGISTRY_HOST=172.21.32.31:5000
+      ports:
+      - 30080:80
+      deploy:
+         replicas: 1
+   portainer:
+      image: 172.21.32.31:5000/portainer/portainer
+      container_name: portainer
+      restart: always
+      volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      ports:
+      - 9000:9000
+      - 2375:2375
+      deploy:
+         replicas: 1
+   sf-modelmanager-service:
+      image: 172.21.32.31:5000/sf-modelmanager-service:1.0.0
+      container_name: sf-modelmanager-service
+      restart: always
+      volumes:
+      - sf-modelmanager-service:/opt/deploy/sf-modelmanager-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8170:8170
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-gatewayproxy-service:
+      image: 172.21.32.31:5000/sf-gatewayproxy-service:1.0.0
+      container_name: sf-gatewayproxy-service
+      restart: always
+      volumes:
+      - sf-gatewayproxy-service:/opt/deploy/sf-gatewayproxy-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8177:8177
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-history-service:
+      image: 172.21.32.31:5000/sf-history-service:1.0.0
+      container_name: sf-history-service
+      restart: always
+      volumes:
+      - sf-history-service:/opt/deploy/sf-history-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8140:8140
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   sf-realtime-service:
+      image: 172.21.32.31:5000/sf-realtime-service:1.0.0
+      container_name: sf-realtime-service
+      restart: always
+      volumes:
+      - sf-realtime-service:/opt/deploy/sf-realtime-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8172:8172
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-manager-service:
+      image: 172.21.32.31:5000/target-manager-service:1.0.0
+      container_name: target-manager-service
+      restart: always
+      volumes:
+      - target-manager-service:/opt/deploy/target-manager-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8631:8631
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-calculate-service:
+      image: 172.21.32.31:5000/target-calculate-service:1.0.0
+      container_name: target-calculate-service
+      restart: always
+      volumes:
+      - target-calculate-service:/opt/deploy/target-calculate-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8731:8731
+      - 65534:65534
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   target-calculate-service2:
+      image: 172.21.32.31:5000/target-calculate-service:1.0.0
+      restart: always
+      volumes:
+      - target-calculate-service2:/opt/deploy/target-calculate-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9731:8731
+      - 55534:65534
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 1
+   system-authority-service:
+      image: 172.21.32.31:5000/authority:1.0.0
+      restart: always
+      volumes:
+      - system-authority-service:/opt/deploy/authority/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8551:8551
+      deploy:
+         replicas: 1
+   system-manager-service:
+      image: 172.21.32.31:5000/system-manager:1.0.0
+      restart: always
+      volumes:
+      - system-manager-service:/opt/deploy/system-manager/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8571:8571
+      deploy:
+         replicas: 1
+   dbs-decision-system-web:
+      image: 172.21.32.31:5000/dbs-decision-system-web:1.0.0
+      restart: always
+      volumes:
+      - dbs-decision-system-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8080:80
+      deploy:
+         replicas: 1
+   dbs-cockpit-web:
+      image: 172.21.32.31:5000/dbs-cockpit-web:1.0.0
+      restart: always
+      volumes:
+      - dbs-cockpit-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 7070:80
+      deploy:
+         replicas: 1
+   target-manager-web:
+      image: 172.21.32.31:5000/target-manager-web:1.0.0
+      restart: always
+      volumes:
+      - target-manager-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9090:80
+      deploy:
+         replicas: 1
+   system-authority-web:
+      image: 172.21.32.31:5000/authority-web:1.0.0
+      restart: always
+      volumes:
+      - system-authority-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8550:80
+      deploy:
+         replicas: 1
+   system-manager-web:
+      image: 172.21.32.31:5000/system-manager-web:1.0.0
+      restart: always
+      volumes:
+      - system-manager-web:/usr/share/nginx/html/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8570:80
+      deploy:
+         replicas: 1
+volumes:
+   mysql:
+      driver: rexray/rbd:latest
+   mysql3307:
+      driver: rexray/rbd:latest
+   redis:
+      driver: rexray/rbd:latest
+   neo4j:
+      driver: rexray/rbd:latest
+   influxdb:
+      driver: rexray/rbd:latest
+   canal-server:
+      driver: rexray/rbd:latest
+   xxl-job-admin:
+      driver: rexray/rbd:latest
+   node-red:
+      driver: rexray/rbd:latest
+   sf-modelmanager-service: /home/deploy/config/sf-modelmanager-service-config
+   sf-gatewayproxy-service: /home/deploy/config/sf-gatewayproxy-service-config
+   sf-history-service: /home/deploy/config/sf-history-service-config
+   sf-realtime-service: /home/deploy/config/sf-realtime-service-config
+   target-manager-service: /home/deploy/config/target-manager-service-config
+   target-calculate-service: /home/deploy/config/target-calculate-service-config
+   target-calculate-service2: /home/deploy/config/target-calculate-service-config2
+   system-authority-service: /home/deploy/config/authority-config
+   system-manager-service: /home/deploy/config/system-manager-config
+   dbs-decision-system-web: /home/deploy/config/dbs-decision-system-web-config
+   dbs-cockpit-web: /home/deploy/config/dbs-cockpit-web-config
+   target-manager-web: /home/deploy/config/target-manager-web-config
+   system-authority-web: /home/deploy/config/authority-web-config
+   system-manager-web: /home/deploy/config/system-manager-web-config
