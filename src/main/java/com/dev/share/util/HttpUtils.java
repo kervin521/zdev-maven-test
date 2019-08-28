@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
@@ -45,11 +46,13 @@ import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -60,11 +63,20 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpTrace;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -83,57 +95,177 @@ import com.google.common.collect.Maps;
  * JDK: 1.8
  */
 public class HttpUtils {
-	private static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 	/**
-	 * http客户端
+	 * HTTP客户端
 	 */
-	private static CloseableHttpClient client = config().build();
+	private static final CloseableHttpClient CLIENT = config().build();
+	/**
+	 * HTTP异步客户端
+	 */
+	private static final CloseableHttpAsyncClient ASYNC_CLIENT = aconfig().build();
+	/**
+	 * HTTP默认连接超时时间(60s)
+	 */
+	public static final int HTTP_DEFAULT_CONNECT_TIMEOUT = 60*1000;
+	/**
+     * HTTP默认Socket超时时间(60s)
+     */
+	public static final int HTTP_DEFAULT_SOCKET_TIMEOUT = 60*1000;
+	/**
+     * HTTP默认连接请求超时时间(600s)
+     */
+	public static final int HTTP_DEFAULT_CONNECTION_REQUEST_TIMEOUT = 10*60*1000;
+	/**
+	 * HTTP默认连接池数量(默认核数)
+	 */
+	public static final int HTTP_DEFAULT_IO_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+	/**
+	 * HTTP默认最大连接数
+	 */
+	public static final int HTTP_DEFAULT_IO_THREAD_MAX_TOTAL = 100;
+	/**
+	 * HTTP默认每个路由最大连接数
+	 */
+	public static final int HTTP_DEFAULT_IO_THREAD_MAX_TOTAL_PER_ROUTE = 100;
+	/**
+	 * HTTP默认保持连接
+	 */
+	public static final boolean HTTP_DEFAULT_IO_KEEP_ALIVE = true;
 	/**
 	 * HTTP协议:http://
 	 */
-	public final static String PROTOCOL_HTTP = "http://";
+	public static final String PROTOCOL_HTTP = "http://";
 	/**
 	 * HTTPS协议:https://
 	 */
-	public final static String PROTOCOL_HTTPS = "https://";
+	public static final String PROTOCOL_HTTPS = "https://";
 	/**
 	 * Get请求
 	 */
-	public final static String METHOD_GET = "GET";
+	public static final String METHOD_GET = "GET";
 	/**
 	 * Post请求
 	 */
-	public final static String METHOD_POST = "POST";
+	public static final String METHOD_POST = "POST";
 	/**
 	 * Head请求
 	 */
-	public final static String METHOD_HEAD = "HEAD";
+	public static final String METHOD_HEAD = "HEAD";
 	/**
 	 * Options请求
 	 */
-	public final static String METHOD_OPTIONS = "OPTIONS";
+	public static final String METHOD_OPTIONS = "OPTIONS";
 	/**
 	 * Put请求
 	 */
-	public final static String METHOD_PUT = "PUT";
+	public static final String METHOD_PUT = "PUT";
 	/**
 	 * Delete请求
 	 */
-	public final static String METHOD_DELETE = "DELETE";
+	public static final String METHOD_DELETE = "DELETE";
 	/**
 	 * Trace请求
 	 */
-	public final static String METHOD_TRACE = "TRACE";
-	
+	public static final String METHOD_TRACE = "TRACE";
 	/**
-	 * @description 初始化配置
+	 * @description HTTP请求环境变量配置
+	 * @author ZhangYi
+	 * @date 2019/08/28 11:05:35
+	 * @return
+	 */
+	private static RequestConfig request() {
+	    RequestConfig conf = RequestConfig.DEFAULT;
+        Map<String, String> env = System.getenv();
+        if(env.containsKey("CONNECT_TIMEOUT")||env.containsKey("SOCKET_TIMEOUT")||env.containsKey("CONNECTION_REQUEST_TIMEOUT")) {
+            Builder build = RequestConfig.custom();
+            int connectTimeout = HTTP_DEFAULT_CONNECT_TIMEOUT;
+            if(env.containsKey("CONNECT_TIMEOUT")&&NumberUtils.isCreatable(env.get("CONNECT_TIMEOUT"))) {
+                connectTimeout = Integer.parseInt(env.get("CONNECT_TIMEOUT"));
+            }
+            int socketTimeout = HTTP_DEFAULT_SOCKET_TIMEOUT;
+            if(env.containsKey("SOCKET_TIMEOUT")&&NumberUtils.isCreatable(env.get("SOCKET_TIMEOUT"))) {
+                socketTimeout = Integer.parseInt(env.get("SOCKET_TIMEOUT"));
+            }
+            int connectionRequestTimeout = HTTP_DEFAULT_CONNECTION_REQUEST_TIMEOUT;
+            if(env.containsKey("CONNECTION_REQUEST_TIMEOUT")&&NumberUtils.isCreatable(env.get("CONNECTION_REQUEST_TIMEOUT"))) {
+                connectionRequestTimeout = Integer.parseInt(env.get("CONNECTION_REQUEST_TIMEOUT"));
+            }
+            build.setConnectTimeout(connectTimeout);
+            build.setSocketTimeout(socketTimeout);
+            build.setConnectionRequestTimeout(connectionRequestTimeout);
+            conf = build.build();
+        }
+        return conf;
+	}
+	/**
+	 * @description HTTP连接池环境变量配置
+	 * @author ZhangYi
+	 * @date 2019/08/28 11:05:35
+	 * @return
+	 */
+	private static PoolingNHttpClientConnectionManager pool() {
+	    IOReactorConfig conf = IOReactorConfig.DEFAULT;
+	    Map<String, String> env = System.getenv();
+	    if(env.containsKey("IO_THREAD_COUNT")||env.containsKey("IO_KEEP_ALIVE")) {
+	        IOReactorConfig.Builder build = IOReactorConfig.custom();
+	        int threadCount = HTTP_DEFAULT_IO_THREAD_COUNT;
+	        if(env.containsKey("IO_THREAD_COUNT")&&NumberUtils.isCreatable(env.get("IO_THREAD_COUNT"))) {
+	            threadCount = Integer.parseInt(env.get("IO_THREAD_COUNT"));
+	        }
+	        boolean keepAlive = HTTP_DEFAULT_IO_KEEP_ALIVE;
+	        if(env.containsKey("IO_KEEP_ALIVE")&&NumberUtils.isCreatable(env.get("IO_KEEP_ALIVE"))) {
+	            keepAlive = Boolean.parseBoolean(env.get("IO_KEEP_ALIVE"));
+	        }
+	        build.setIoThreadCount(threadCount);
+	        build.setSoKeepAlive(keepAlive);
+	        conf = build.build();
+	    }
+	    PoolingNHttpClientConnectionManager connManager = null;
+        try {
+            ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(conf);
+            connManager = new PoolingNHttpClientConnectionManager(ioReactor);
+            int maxTotal = HTTP_DEFAULT_IO_THREAD_MAX_TOTAL;
+            if(env.containsKey("IO_THREAD_MAX_TOTAL")&&NumberUtils.isCreatable(env.get("IO_THREAD_MAX_TOTAL"))) {
+                maxTotal = Integer.parseInt(env.get("IO_THREAD_MAX_TOTAL"));
+            }
+            int maxTotalPerRoute = HTTP_DEFAULT_IO_THREAD_MAX_TOTAL_PER_ROUTE;
+            if(env.containsKey("IO_THREAD_MAX_TOTAL_PER_ROUTE")&&NumberUtils.isCreatable(env.get("IO_THREAD_MAX_TOTAL_PER_ROUTE"))) {
+                maxTotalPerRoute = Integer.parseInt(env.get("IO_THREAD_MAX_TOTAL_PER_ROUTE"));
+            }
+            connManager.setMaxTotal(maxTotal);
+            connManager.setDefaultMaxPerRoute(maxTotalPerRoute);
+        } catch (IOReactorException e) {
+            logger.error("--HTTP线程池初始化异常:",e);
+        } catch (Exception e) {
+            logger.error("--HTTP配置初始化异常:",e);
+        }
+	    return connManager;
+	}
+	/**
+	 * @description HTTP同步请求配置
 	 * @author ZhangYi
 	 * @date 2019/08/19 10:59:13
 	 * @return
 	 */
 	private static HttpClientBuilder config() {
+	    RequestConfig request = request();
 	    HttpClientBuilder builder = HttpClients.custom();
-	    builder.setDefaultRequestConfig(RequestConfig.DEFAULT);
+	    builder.setDefaultRequestConfig(request);
+	    return builder;
+	}
+	/**
+	 * @description HTTP异步请求配置
+	 * @author ZhangYi
+	 * @date 2019/08/19 10:59:13
+	 * @return
+	 */
+	private static HttpAsyncClientBuilder aconfig() {
+	    RequestConfig request = request();
+	    PoolingNHttpClientConnectionManager connManager = pool();
+	    HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
+	    builder.setDefaultRequestConfig(request);
+	    builder.setConnectionManager(connManager);
 	    return builder;
 	}
 	/**
@@ -249,7 +381,7 @@ public class HttpUtils {
 		try {
 			registerProtocol(url);
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setConnectTimeout(5 * 1000);
+			connection.setConnectTimeout(HTTP_DEFAULT_CONNECT_TIMEOUT);
 			if (auth != null && !"".equals(auth)) {
 				String authorization = "Basic " + new String(Base64.encodeBase64(auth.getBytes()));
 				connection.setRequestProperty("Authorization", authorization);
@@ -280,7 +412,7 @@ public class HttpUtils {
 		try {
 			registerProtocol(url);
 			HttpRequestBase http = new HttpHead(url);
-			response = client.execute(http);
+			response = CLIENT.execute(http);
 			if (response != null && (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK || response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED)) {
 				flag = true;
 			}
@@ -359,9 +491,20 @@ public class HttpUtils {
 		String result = httpRequest(url, method, params, null, auth);
 		return result;
 	}
+	/**
+	 * 描述: HTTP异步请求封装
+	 * @param url    请求URL
+	 * @param method 请求URL
+	 * @param param  json参数(post|put)
+	 * @param auth   认证信息(username+":"+password)
+	 * @return 返回结果
+	 */
+	public static void httpAsynRequest(String url, String method, Map<String, Object> params, String auth) {
+	    httpAsynRequest(url, method, params, null, auth);
+	}
 
 	/**
-	 * 描述: Http请求封装
+	 * 描述: HTTP同步请求封装
 	 * 
 	 * @author ZhangYi
 	 * @date 2019-05-27 11:18:40
@@ -376,9 +519,24 @@ public class HttpUtils {
 		String result = httpRequest(url, method, params, headers, null, null, auth);
 		return result;
 	}
+	/**
+	 * 描述: HTTP异步请求封装
+	 * 
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url     请求URL
+	 * @param method  请求方式
+	 * @param params  请求参数
+	 * @param headers 请求头
+	 * @param auth    认证信息(username+":"+password)
+	 * @return
+	 */
+	public static void httpAsynRequest(String url, String method, Map<String, Object> params, Map<String, String> headers, String auth) {
+	    httpAsynRequest(url, method, params, headers, null, null, auth,false);
+	}
 
 	/**
-	 * 描述: Http请求封装
+	 * 描述: HTTP同步请求封装
 	 * 
 	 * @author ZhangYi
 	 * @date 2019-05-27 11:18:40
@@ -393,9 +551,24 @@ public class HttpUtils {
 		String result = httpRequest(url, method, params, headers, null, null, auth);
 		return result;
 	}
+	/**
+	 * 描述: HTTP异步请求
+	 * 
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url     请求URL
+	 * @param method  请求方式
+	 * @param params  请求参数
+	 * @param headers 请求头
+	 * @param auth    认证信息(username+":"+password)
+	 * @return
+	 */
+	public static <T> void httpAsynRequest(String url, String method, Collection<T> params, Map<String, String> headers, String auth) {
+	    httpAsynRequest(url, method, params, headers, null, null, auth,false);
+	}
 
 	/**
-	 * 描述: Http请求封装
+	 * 描述: HTTP同步请求
 	 * 
 	 * @author ZhangYi
 	 * @date 2019-05-27 11:18:40
@@ -412,74 +585,9 @@ public class HttpUtils {
 		String result = null;
 		HttpResponse response = null;
 		try {
-			Charset encode = Consts.UTF_8;
-			if (!StringUtils.isBlank(charset) && Charset.isSupported(charset)) {
-				encode = Charset.forName(charset);
-			}
-			if (StringUtils.isNotBlank(contentType)) {
-				if (contentType.contains("\"") || contentType.contains(";") || contentType.contains(",")) {
-					int fromIndex = contentType.length();
-					if (contentType.contains("\"")) {
-						fromIndex = contentType.indexOf('"');
-					} else if (contentType.contains(",")) {
-						fromIndex = contentType.indexOf(',');
-					} else {
-						fromIndex = contentType.indexOf(';');
-					}
-					contentType = contentType.substring(0, contentType.indexOf(fromIndex));
-				}
-			} else {
-				contentType = ContentType.APPLICATION_JSON.getMimeType();
-			}
-			ContentType httpContentType = ContentType.create(contentType, encode);
-			String param = httpParams(method, params);
-			if (!(method.equalsIgnoreCase(METHOD_POST) || method.equalsIgnoreCase(METHOD_PUT))) {
-				url += (url.contains("?") ? (url.endsWith("&") ? "" : "&") : "?") + param;
-			}
-			registerProtocol(url);
-			HttpRequestBase http = new HttpGet(url);
-			if (method.equalsIgnoreCase(METHOD_POST)) {
-				http = new HttpPost(url);
-				StringEntity body = new StringEntity(param, httpContentType);
-				body.setContentType(httpContentType.getMimeType());
-				((HttpPost) http).setEntity(body);
-			} else if (method.equalsIgnoreCase(METHOD_PUT)) {
-				http = new HttpPut(url);
-				StringEntity body = new StringEntity(param, httpContentType);
-				body.setContentType(httpContentType.getMimeType());
-				((HttpPut) http).setEntity(body);
-			} else if (method.equalsIgnoreCase(METHOD_DELETE)) {
-				http = new HttpDelete(url);
-			} else if (method.equalsIgnoreCase(METHOD_HEAD)) {
-				http = new HttpHead(url);
-			} else if (method.equalsIgnoreCase(METHOD_OPTIONS)) {
-				http = new HttpOptions(url);
-			} else if (method.equalsIgnoreCase(METHOD_TRACE)) {
-				http = new HttpTrace(url);
-			}
-			if (StringUtils.isNotBlank(auth)) {
-				String authorization = "Basic " + new String(Base64.encodeBase64(auth.getBytes()));
-				http.setHeader(HttpHeaders.AUTHORIZATION, authorization);
-			}
-			http.setHeader(HttpHeaders.CONNECTION, "close");
-			if (headers != null && !headers.isEmpty()) {
-				for (Entry<String, String> entity : headers.entrySet()) {
-					String key = entity.getKey();
-					if (StringUtils.isBlank(key)) {
-						continue;
-					}
-					String value = entity.getValue();
-					http.setHeader(key, value);
-				}
-			}
-			response = client.execute(http);
-			if (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK || response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED) {
-				HttpEntity entity = response.getEntity();
-				result = EntityUtils.toString(entity, Consts.UTF_8);
-			} else {
-				result = "{\"statuscode\":" + response.getStatusLine().getStatusCode() + ",\"message\":\"" + response.getStatusLine().getReasonPhrase() + "\"}";
-				result = JSON.parseObject(result).toJSONString();
-			}
+			HttpRequestBase http = httpInit(url, method, params, headers, contentType, charset, auth);
+			response = CLIENT.execute(http);
+			result = httpResult(response, url, method, params, true);
 		} catch (Exception e) {
 			logger.error("--http request error {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", e);
 			result = e.getMessage();
@@ -487,6 +595,165 @@ public class HttpUtils {
 			HttpClientUtils.closeQuietly(response);
 		}
 		return result;
+	}
+	/**
+	 * 描述: HTTP异步请求
+	 * 
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url         请求URL
+	 * @param method      请求方式
+	 * @param params      请求参数
+	 * @param headers     请求头
+	 * @param contentType 内容类型
+	 * @param charset     编码方式
+	 * @param auth        认证信息(username+":"+password)
+	 * @return
+	 */
+	public static String httpAsynRequest(String url, String method, Object params, Map<String, String> headers, String contentType, String charset, String auth,boolean waitForResponse) {
+	    String aresult = null;
+	    try {
+	        HttpRequestBase http = httpInit(url, method, params, headers, contentType, charset, auth);
+	        ASYNC_CLIENT.start();
+	        Future<HttpResponse> future = ASYNC_CLIENT.execute(http, new FutureCallback<HttpResponse>() {
+                @Override
+                public void failed(Exception ex) {
+                    logger.error("--HTTP Asyn request fail {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", ex);
+                }
+                @Override
+                public void completed(HttpResponse response) {
+                    httpResult(response, url, method, params, !waitForResponse);
+                    logger.info("--HTTP Asyn request success ");
+                }
+                @Override
+                public void cancelled() {
+                    logger.error("--HTTP Asyn request cancel {url:{},method:{},params:{}}!",url,method,JSON.toJSONString(params));
+                }
+            });
+	        if(waitForResponse&&future.isDone()) {
+	            HttpResponse response = future.get();
+	            aresult = httpResult(response, url, method, params, true);
+	        }
+	    } catch (Exception e) {
+	        logger.error("--HTTP Asyn request error {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", e);
+	        aresult = e.getMessage();
+	    }
+	    return aresult;
+	}
+	/**
+	 * @description HTTP请求结果解析
+	 * @author ZhangYi
+	 * @date 2019/08/28 13:24:42
+	 * @param response 请求结果
+	 * @param url 请求URL
+	 * @param method 请求方式
+	 * @param params 参数
+	 * @param closeResponse 是否关闭响应
+	 * @return
+	 */
+	private static String httpResult(HttpResponse response,String url, String method, Object params, boolean closeResponse) {
+	    String result = null;
+        try {
+            if (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK || response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED) {
+                HttpEntity entity = response.getEntity();
+                result = EntityUtils.toString(entity, Consts.UTF_8);
+            } else {
+                result = "{\"statuscode\":" + response.getStatusLine().getStatusCode() + ",\"message\":\"" + response.getStatusLine().getReasonPhrase() + "\"}";
+                result = JSON.parseObject(result).toJSONString();
+            }
+            logger.info("--HTTP request success {url:{},method:{},params:{},result:{}}!",url,method,JSON.toJSONString(params),result);
+        }catch (Exception e) {
+            logger.error("--http request error {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", e);
+            result = e.getMessage();
+        } finally {
+            if(closeResponse) {
+                HttpClientUtils.closeQuietly(response);
+            }
+        }
+        return result;
+	}
+	/**
+	 * 描述: HTTP同步请求封装
+	 * 
+	 * @author ZhangYi
+	 * @date 2019-05-27 11:18:40
+	 * @param url         请求URL
+	 * @param method      请求方式
+	 * @param params      请求参数
+	 * @param headers     请求头
+	 * @param contentType 内容类型
+	 * @param charset     编码方式
+	 * @param auth        认证信息(username+":"+password)
+	 * @return
+	 */
+	private static HttpRequestBase httpInit(String url, String method, Object params, Map<String, String> headers, String contentType, String charset, String auth) {
+	    HttpRequestBase http = null;
+	    try {
+	        Charset encode = Consts.UTF_8;
+	        if (!StringUtils.isBlank(charset) && Charset.isSupported(charset)) {
+	            encode = Charset.forName(charset);
+	        }
+	        if (StringUtils.isNotBlank(contentType)) {
+	            if (contentType.contains("\"") || contentType.contains(";") || contentType.contains(",")) {
+	                int fromIndex = contentType.length();
+	                if (contentType.contains("\"")) {
+	                    fromIndex = contentType.indexOf('"');
+	                } else if (contentType.contains(",")) {
+	                    fromIndex = contentType.indexOf(',');
+	                } else if (contentType.contains(";")) {
+	                    fromIndex = contentType.indexOf(';');
+	                }
+	                contentType = contentType.substring(0, contentType.indexOf(fromIndex));
+	            }
+	        } else {
+	            contentType = ContentType.APPLICATION_JSON.getMimeType();
+	        }
+	        ContentType httpContentType = ContentType.create(contentType, encode);
+	        String param = httpParams(method, params);
+	        if (!(method.equalsIgnoreCase(METHOD_POST) || method.equalsIgnoreCase(METHOD_PUT))) {
+	            String temp = (url.endsWith("&") ? "" : "&");
+	            url += (url.contains("?") ? temp : "?") + param;
+	        }
+	        registerProtocol(url);
+	        http = new HttpGet(url);
+	        if (method.equalsIgnoreCase(METHOD_POST)) {
+	            http = new HttpPost(url);
+	            StringEntity body = new StringEntity(param, httpContentType);
+	            body.setContentType(httpContentType.getMimeType());
+	            ((HttpPost) http).setEntity(body);
+	        } else if (method.equalsIgnoreCase(METHOD_PUT)) {
+	            http = new HttpPut(url);
+	            StringEntity body = new StringEntity(param, httpContentType);
+	            body.setContentType(httpContentType.getMimeType());
+	            ((HttpPut) http).setEntity(body);
+	        } else if (method.equalsIgnoreCase(METHOD_DELETE)) {
+	            http = new HttpDelete(url);
+	        } else if (method.equalsIgnoreCase(METHOD_HEAD)) {
+	            http = new HttpHead(url);
+	        } else if (method.equalsIgnoreCase(METHOD_OPTIONS)) {
+	            http = new HttpOptions(url);
+	        } else if (method.equalsIgnoreCase(METHOD_TRACE)) {
+	            http = new HttpTrace(url);
+	        }
+	        if (StringUtils.isNotBlank(auth)) {
+	            String authorization = "Basic " + new String(Base64.encodeBase64(auth.getBytes()));
+	            http.setHeader(HttpHeaders.AUTHORIZATION, authorization);
+	        }
+	        http.setHeader(HttpHeaders.CONNECTION, "close");
+	        if (headers != null && !headers.isEmpty()) {
+	            for (Entry<String, String> entity : headers.entrySet()) {
+	                String key = entity.getKey();
+	                if (StringUtils.isBlank(key)) {
+	                    continue;
+	                }
+	                String value = entity.getValue();
+	                http.setHeader(key, value);
+	            }
+	        }
+	    } catch (Exception e) {
+	        logger.error("--http request init error {url:"+url+",method:"+method+",params:"+JSON.toJSONString(params)+"}!", e);
+	    }
+	    return http;
 	}
 
 	/**
@@ -512,7 +779,7 @@ public class HttpUtils {
 		try {
 			registerProtocol(url);
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setConnectTimeout(60 * 1000);
+			connection.setConnectTimeout(HTTP_DEFAULT_CONNECT_TIMEOUT);
 			connection.setRequestMethod(method.toUpperCase());
 			if (auth != null && !"".equals(auth)) {
 				String authorization = "Basic " + new String(Base64.encodeBase64(auth.getBytes()));
@@ -611,7 +878,7 @@ public class HttpUtils {
 				http.setHeader(HttpHeaders.AUTHORIZATION, authorization);
 			}
 			http.setHeader(HttpHeaders.CONNECTION, "close");
-			CloseableHttpResponse resp = client.execute(http);
+			CloseableHttpResponse resp = CLIENT.execute(http);
 			HttpEntity entity = resp.getEntity();
 			if (resp.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK || resp.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				in = entity.getContent();
@@ -767,14 +1034,14 @@ public class HttpUtils {
 	public static void main(String[] args) {
 		String id = "";
 //		String url = "http://172.21.32.31:8172/hollysys-eam/realtime/read-tags";
-		String url = "http://172.21.32.31:8172/hollysys-eam/realtime/write-tags";
+		String url = "http://172.21.32.110:8172/dbsznjc/realtime/write-tags";
 		if (!"".equals(id)) {
 			url = url + "/" + id;
 		} else {
 //			url=url+"/_search";
 		}
 
-		String method = "get";
+		String method = "post";
 //		String body = "[\"dbs-test#cd1\",\"dbs-test#cd3\"]";
 		String body = "[\r\n" + "  {\r\n" + "    \"tag\": \"A_3\",\r\n" + "    \"type\": 0,\r\n" + "    \"value\": \"1\"\r\n" + "  }\r\n" + "]";
 //		String body = "{\"name\":\"mobile music\",\"operator\":\"10000\",\"content\":\"I like music!\",\"createTime\":\"2017-04-20\"}";
@@ -783,8 +1050,11 @@ public class HttpUtils {
 		result = ping(url) + "";
 //		result = checkConnection("http://127.0.0.1:9200",null)+"";
 //		System.out.println(result);
-		List<JSONObject> params = JSON.parseArray(body, JSONObject.class);
-		result = httpRequest(url, method, params, null, null);
+		List<JSONObject> tags = JSON.parseArray(body, JSONObject.class);
+		Map<String, Object> condition = Maps.newHashMap();
+        condition.put("values", tags);
+		httpAsynRequest(url, method, condition, null, null);
+		httpAsynRequest(url, method, condition, null, null);
 		System.out.println("---------------------------------------------------------");
 //		result = urlRequest(url, method, param);
 		System.out.println(result);

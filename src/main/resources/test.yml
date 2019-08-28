@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+   mysql:
+      image: 172.21.32.31:5000/mysql-canal:5.7.22
+      container_name: mysql
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=SqlPwd1@
+      volumes:
+      - mysql:/var/lib/mysql
+      ports:
+      - 3306:3306
+      deploy:
+         replicas: 1
+volumes:
+   mysql:
+      driver: rexray/rbd:latest

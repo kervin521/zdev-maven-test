@@ -131,11 +131,56 @@
 		    <version>1.1.8</version>
 		</dependency>
 		
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sf.cache4j</groupId>
 			<artifactId>cache4j</artifactId>
 			<version>0.4</version>
+		</dependency> -->
+		<dependency>
+			<groupId>com.amihaiemil.web</groupId>
+			<artifactId>docker-java-api</artifactId>
+			<version>0.0.10</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.docker-java</groupId>
+      		<artifactId>docker-java</artifactId>
+			<version>3.1.5</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.spotify</groupId>
+		  <artifactId>docker-client</artifactId>
+		  <version>8.16.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jclouds.labs</groupId>
+		    <artifactId>docker</artifactId>
+		    <version>1.9.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jclouds.api</groupId>
+		    <artifactId>docker</artifactId>
+		    <version>2.1.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.testifyproject.container</groupId>
+		    <artifactId>docker</artifactId>
+		    <version>0.9.3</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.testifyproject.virtual-resources</groupId>
+		    <artifactId>docker</artifactId>
+		    <version>1.0.2</version>
+		    <scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.eclipse.che.infrastructure.docker</groupId>
+		    <artifactId>docker-environment</artifactId>
+		    <version>7.0.0</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-benchmark</artifactId>
@@ -477,13 +522,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpasyncclient-cache</artifactId>
+		    <version>4.1.4</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-		</dependency>
+		
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
