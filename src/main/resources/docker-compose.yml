@@ -10,6 +10,10 @@ services:
       - 1883:1883
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    mysql:
       image: 172.21.32.31:5000/mysql-canal:5.7.22
       container_name: mysql
@@ -23,6 +27,10 @@ services:
       - 3306:3306
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    mysql3307:
       image: 172.21.32.31:5000/mysqld:5.7.27
       restart: always
@@ -35,6 +43,10 @@ services:
       - 3307:3306
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    mysql3308:
       image: 172.21.32.31:5000/mysqld:5.7.27
       restart: always
@@ -47,10 +59,14 @@ services:
       - 3308:3306
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    phpmyadmin:
       image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
       restart: always
-      links:
+      depends_on:
       - mysql
       environment:
       - PMA_HOST=mysql
@@ -59,10 +75,14 @@ services:
       - 30680:80
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    phpmyadmin3307:
       image: 172.21.32.31:5000/phpmyadmin/phpmyadmin:4.8.1
       restart: always
-      links:
+      depends_on:
       - mysql3307
       environment:
       - PMA_HOST=mysql3307
@@ -71,6 +91,10 @@ services:
       - 30780:80
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    redis:
       image: 172.21.32.31:5000/redis:4.0.9-alpine
       restart: always
@@ -80,6 +104,21 @@ services:
       - 6379:6379
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   redis-auth:
+      image: 172.21.32.31:5000/redis:4.0.9-alpine
+      restart: always
+      ports:
+      - 6399:6379
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    redis-message:
       image: 172.21.32.31:5000/redis:4.0.9-alpine
       restart: always
@@ -89,6 +128,10 @@ services:
       - 6389:6379
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server110
    neo4j:
       image: 172.21.32.31:5000/neo4j:3.4
       restart: always
@@ -99,6 +142,10 @@ services:
       - 7474:7474
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    influxdb:
       image: 172.21.32.31:5000/influxdb:1.5.4-alpine
       restart: always
@@ -108,18 +155,24 @@ services:
       - 8086:8086
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    canal-server:
-      image: 172.21.32.31:5000/canal-server
+      image: 172.21.32.31:5000/canal/canal-server:v1.1.3
       restart: always
       volumes:
-      - /opt/deploy/data/canal-server-conf:/home/admin/canal-server/conf
+      - /opt/deploy/data/canal/server:/home/admin/canal-server/conf
+      - /etc/localtime:/etc/localtime
       ports:
       - 11111:11111
-      links:
-      - mysql
-      - mysql3307
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    node-red-01:
       image: 172.21.32.31:5000/hollysys-node-red:1.0.0
       restart: always
@@ -130,6 +183,10 @@ services:
       - 18800:1880
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    node-red-02:
       image: 172.21.32.31:5000/hollysys-node-red:1.0.0
       restart: always
@@ -140,6 +197,10 @@ services:
       - 18801:1880
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    node-red-03:
       image: 172.21.32.31:5000/hollysys-node-red:1.0.0
       restart: always
@@ -150,6 +211,80 @@ services:
       - 18802:1880
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   node-red-04:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      restart: always
+      privileged: true
+      volumes:
+      - /opt/deploy/data/node-red-data-04:/data
+      ports:
+      - 18804:1880
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   node-red-05:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      restart: always
+      privileged: true
+      volumes:
+      - /opt/deploy/data/node-red-data-05:/data
+      ports:
+      - 18805:1880
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   node-red-06:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      restart: always
+      privileged: true
+      volumes:
+      - /opt/deploy/data/node-red-data-06:/data
+      ports:
+      - 18806:1880
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   node-red-07:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      restart: always
+      privileged: true
+      volumes:
+      - /opt/deploy/data/node-red-data-07:/data
+      ports:
+      - 18807:1880
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
+   node-red-08:
+      image: 172.21.32.31:5000/hollysys-node-red:1.0.0
+      restart: always
+      privileged: true
+      volumes:
+      - /opt/deploy/data/node-red-data-08:/data
+      ports:
+      - 18808:1880
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
    registry-ui:
       image: 172.21.32.31:5000/jc21/registry-ui:2.0.2
       restart: always
@@ -159,6 +294,10 @@ services:
       - 30080:80
       deploy:
          replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server106
 ##############################################################################################
 ####################################### App Service###########################################
 ##############################################################################################
@@ -168,10 +307,10 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/xxl-job-admin-config:/opt/deploy/xxl-job-admin/config
+      - /opt/deploy/conf/xxl-job-admin:/opt/deploy/xxl-job-admin/config
       ports:
       - 7072:7072
-      links:
+      depends_on:
       - mysql3307
       logging:
          driver: json-file
@@ -186,11 +325,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-modelmanager-service-config:/opt/deploy/sf-modelmanager-service/config
+      - /opt/deploy/conf/sf-modelmanager-service:/opt/deploy/sf-modelmanager-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8170:8170
-      links:
+      depends_on:
       - neo4j
       logging:
          driver: json-file
@@ -205,11 +344,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-gatewayproxy-service-config:/opt/deploy/sf-gatewayproxy-service/config
+      - /opt/deploy/conf/sf-gatewayproxy-service:/opt/deploy/sf-gatewayproxy-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8177:8177
-      links:
+      depends_on:
       - neo4j
       - redis
       logging:
@@ -225,11 +364,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-history-service-config:/opt/deploy/sf-history-service/config
+      - /opt/deploy/conf/sf-history-service:/opt/deploy/sf-history-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8140:8140
-      links:
+      depends_on:
       - influxdb
       - redis
       - neo4j
@@ -247,11 +386,31 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-realtime-service-config:/opt/deploy/sf-realtime-service/config
+      - /opt/deploy/conf/sf-realtime-service:/opt/deploy/sf-realtime-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8272:8172
-      links:
+      depends_on:
+      - redis
+      - neo4j
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 6
+   sf-realtime-route-service:
+      image: 172.21.32.31:5000/sf-realtime-service:1.0.0
+      restart: always
+      environment:
+      - NETWORK_NAME=eth0
+      volumes:
+      - /opt/deploy/conf/sf-realtime-route-service:/opt/deploy/sf-realtime-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8172:8172
+      depends_on:
       - redis
       - neo4j
       - canal-server
@@ -262,37 +421,17 @@ services:
             max-file: '5'
       deploy:
          replicas: 1
-   sf-realtime-distribute-service:
-      image: 172.21.32.31:5000/sf-realtime-service:1.0.0
-      restart: always
-      environment:
-      - NETWORK_NAME=eth0
-      volumes:
-      - /opt/deploy/conf/sf-realtime-service-config1:/opt/deploy/sf-realtime-service/config
-      - /etc/localtime:/etc/localtime
-      ports:
-      - 8172:8172
-      links:
-      - redis
-      - neo4j
-      logging:
-         driver: json-file
-         options:
-            max-size: 10m
-            max-file: '5'
-      deploy:
-         replicas: 21
    target-manager-service:
       image: 172.21.32.31:5000/target-manager-service:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/target-manager-service-config:/opt/deploy/target-manager-service/config
+      - /opt/deploy/conf/target-manager-service:/opt/deploy/target-manager-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8631:8631
-      links:
+      depends_on:
       - sf-modelmanager-service
       logging:
          driver: json-file
@@ -308,12 +447,12 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8731:8731
       - 65534:65534
-      links:
+      depends_on:
       - mysql3307
       - sf-realtime-service
       - xxl-job-admin
@@ -331,12 +470,12 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config1:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-label-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 9731:8731
       - 55534:65534
-      links:
+      depends_on:
       - mysql3307
       - sf-realtime-service
       logging:
@@ -345,20 +484,20 @@ services:
             max-size: 10m
             max-file: '5'
       deploy:
-         replicas: 5
-   target-calculate-labelX-service:
+         replicas: 21
+   target-calculate-route-service:
       image: 172.21.32.31:5000/target-calculate-service:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config11:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-route-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 6731:8731
       - 45534:65534
-      links:
+      depends_on:
       - mysql3307
       - sf-realtime-service
       logging:
@@ -375,12 +514,12 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config2:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-job-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 7731:8731
       - 35534:65534
-      links:
+      depends_on:
       - mysql3307
       - sf-realtime-service
       - xxl-job-admin
@@ -390,17 +529,17 @@ services:
             max-size: 10m
             max-file: '5'
       deploy:
-         replicas: 21
+         replicas: 1
    system-authority-service:
       image: 172.21.32.31:5000/authority:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
-      links:
+      depends_on:
       - redis
       - mysql3308
       volumes:
-      - /opt/deploy/conf/authority-config:/opt/deploy/authority/config
+      - /opt/deploy/conf/system-authority-service:/opt/deploy/authority/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8551:8551
@@ -411,10 +550,10 @@ services:
       restart: always
       environment:
       - NETWORK_NAME=eth0
-      links:
+      depends_on:
       - mysql3308
       volumes:
-      - /opt/deploy/conf/system-manager-config:/opt/deploy/system-manager/config
+      - /opt/deploy/conf/system-manager-service:/opt/deploy/system-manager/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8571:8571
@@ -424,7 +563,7 @@ services:
       image: 172.21.32.31:5000/dbs-decision-system-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8080:80
@@ -434,7 +573,7 @@ services:
       image: 172.21.32.31:5000/dbs-cockpit-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 7070:80
@@ -444,7 +583,7 @@ services:
       image: 172.21.32.31:5000/target-manager-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 9090:80
@@ -454,7 +593,7 @@ services:
       image: 172.21.32.31:5000/authority-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8550:80
@@ -464,7 +603,7 @@ services:
       image: 172.21.32.31:5000/system-manager-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8570:80

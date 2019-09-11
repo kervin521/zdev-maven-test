@@ -50,7 +50,7 @@ services:
    phpmyadmin:
       image: phpmyadmin/phpmyadmin:4.8.1
       restart: always
-      links:
+      depends_on:
       - mysql
       environment:
       - PMA_HOST=mysql
@@ -62,7 +62,7 @@ services:
    phpmyadmin3307:
       image: phpmyadmin/phpmyadmin:4.8.1
       restart: always
-      links:
+      depends_on:
       - mysql3307
       environment:
       - PMA_HOST=mysql3307
@@ -78,6 +78,13 @@ services:
       - /opt/deploy/data/redis-data:/data
       ports:
       - 6379:6379
+      deploy:
+         replicas: 1
+   redis-auth:
+      image: redis:4.0.9-alpine
+      restart: always
+      ports:
+      - 6399:6379
       deploy:
          replicas: 1
    redis-message:
@@ -109,15 +116,14 @@ services:
       deploy:
          replicas: 1
    canal-server:
-      image: canal-server
+      image: canal/canal-server:v1.1.3
       restart: always
       volumes:
-      - /opt/deploy/data/canal-server-conf:/home/admin/canal-server/conf
+      - /opt/deploy/data/canal/server:/home/admin/canal-server/conf
       ports:
       - 11111:11111
-      links:
+      depends_on:
       - mysql
-      - mysql3307
       deploy:
          replicas: 1
    node-red-01:
@@ -150,15 +156,6 @@ services:
       - 18802:1880
       deploy:
          replicas: 1
-   registry-ui:
-      image: jc21/registry-ui:2.0.2
-      restart: always
-      environment:
-      - REGISTRY_HOST=172.21.32.31:5000
-      ports:
-      - 30080:80
-      deploy:
-         replicas: 1
 ##############################################################################################
 ####################################### App Service###########################################
 ##############################################################################################
@@ -168,10 +165,10 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/xxl-job-admin-config:/opt/deploy/xxl-job-admin/config
+      - /opt/deploy/conf/xxl-job-admin:/opt/deploy/xxl-job-admin/config
       ports:
       - 7072:7072
-      links:
+      depends_on:
       - mysql3307
       logging:
          driver: json-file
@@ -186,11 +183,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-modelmanager-service-config:/opt/deploy/sf-modelmanager-service/config
+      - /opt/deploy/conf/sf-modelmanager-service:/opt/deploy/sf-modelmanager-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8170:8170
-      links:
+      depends_on:
       - neo4j
       logging:
          driver: json-file
@@ -205,11 +202,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-gatewayproxy-service-config:/opt/deploy/sf-gatewayproxy-service/config
+      - /opt/deploy/conf/sf-gatewayproxy-service:/opt/deploy/sf-gatewayproxy-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8177:8177
-      links:
+      depends_on:
       - neo4j
       - redis
       logging:
@@ -225,11 +222,11 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-history-service-config:/opt/deploy/sf-history-service/config
+      - /opt/deploy/conf/sf-history-service:/opt/deploy/sf-history-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8140:8140
-      links:
+      depends_on:
       - influxdb
       - redis
       - neo4j
@@ -247,11 +244,31 @@ services:
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/sf-realtime-service-config:/opt/deploy/sf-realtime-service/config
+      - /opt/deploy/conf/sf-realtime-service:/opt/deploy/sf-realtime-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8272:8172
-      links:
+      depends_on:
+      - redis
+      - neo4j
+      logging:
+         driver: json-file
+         options:
+            max-size: 10m
+            max-file: '5'
+      deploy:
+         replicas: 6
+   sf-realtime-route-service:
+      image: sf-realtime-service:1.0.0
+      restart: always
+      environment:
+      - NETWORK_NAME=eth0
+      volumes:
+      - /opt/deploy/conf/sf-realtime-route-service:/opt/deploy/sf-realtime-service/config
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8172:8172
+      depends_on:
       - redis
       - neo4j
       - canal-server
@@ -262,37 +279,19 @@ services:
             max-file: '5'
       deploy:
          replicas: 1
-   sf-realtime-distribute-service:
-      image: sf-realtime-service:1.0.0
-      restart: always
-      environment:
-      - NETWORK_NAME=eth0
-      volumes:
-      - /opt/deploy/conf/sf-realtime-service-config1:/opt/deploy/sf-realtime-service/config
-      - /etc/localtime:/etc/localtime
-      ports:
-      - 8172:8172
-      links:
-      - redis
-      - neo4j
-      logging:
-         driver: json-file
-         options:
-            max-size: 10m
-            max-file: '5'
-      deploy:
-         replicas: 21
    target-manager-service:
       image: target-manager-service:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
       volumes:
-      - /opt/deploy/conf/target-manager-service-config:/opt/deploy/target-manager-service/config
+      - /opt/deploy/conf/target-manager-service:/opt/deploy/target-manager-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8631:8631
-      links:
+      depends_on:
+      - mysql
+      - sf-realtime-service
       - sf-modelmanager-service
       logging:
          driver: json-file
@@ -308,14 +307,15 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8731:8731
       - 65534:65534
-      links:
-      - mysql3307
+      depends_on:
+      - mysql
       - sf-realtime-service
+      - xxl-job-admin
       logging:
          driver: json-file
          options:
@@ -330,13 +330,13 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config1:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-label-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 9731:8731
       - 55534:65534
-      links:
-      - mysql3307
+      depends_on:
+      - mysql
       - sf-realtime-service
       logging:
          driver: json-file
@@ -344,21 +344,21 @@ services:
             max-size: 10m
             max-file: '5'
       deploy:
-         replicas: 5
-   target-calculate-labelX-service:
+         replicas: 21
+   target-calculate-route-service:
       image: target-calculate-service:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config11:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-route-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 6731:8731
       - 45534:65534
-      links:
-      - mysql3307
+      depends_on:
+      - mysql
       - sf-realtime-service
       logging:
          driver: json-file
@@ -374,31 +374,32 @@ services:
       - NETWORK_NAME=eth0
       - DEBUG_VERBOSE=false
       volumes:
-      - /opt/deploy/conf/target-calculate-service-config2:/opt/deploy/target-calculate-service/config
+      - /opt/deploy/conf/target-calculate-job-service:/opt/deploy/target-calculate-service/config
       - /etc/localtime:/etc/localtime
       ports:
       - 7731:8731
       - 35534:65534
-      links:
-      - mysql3307
+      depends_on:
+      - mysql
       - sf-realtime-service
+      - xxl-job-admin
       logging:
          driver: json-file
          options:
             max-size: 10m
             max-file: '5'
       deploy:
-         replicas: 21
+         replicas: 1
    system-authority-service:
       image: authority:1.0.0
       restart: always
       environment:
       - NETWORK_NAME=eth0
-      links:
+      depends_on:
       - redis
       - mysql3308
       volumes:
-      - /opt/deploy/conf/authority-config:/opt/deploy/authority/config
+      - /opt/deploy/conf/system-authority-service:/opt/deploy/authority/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8551:8551
@@ -409,10 +410,10 @@ services:
       restart: always
       environment:
       - NETWORK_NAME=eth0
-      links:
+      depends_on:
       - mysql3308
       volumes:
-      - /opt/deploy/conf/system-manager-config:/opt/deploy/system-manager/config
+      - /opt/deploy/conf/system-manager-service:/opt/deploy/system-manager/config
       - /etc/localtime:/etc/localtime
       ports:
       - 8571:8571
@@ -422,7 +423,7 @@ services:
       image: dbs-decision-system-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8080:80
@@ -432,7 +433,7 @@ services:
       image: dbs-cockpit-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 7070:80
@@ -442,7 +443,7 @@ services:
       image: target-manager-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 9090:80
@@ -452,7 +453,7 @@ services:
       image: authority-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8550:80
@@ -462,7 +463,7 @@ services:
       image: system-manager-web:1.0.0
       restart: always
       volumes:
-      - /opt/deploy/conf/web-config:/usr/share/nginx/html/config:ro
+      - /opt/deploy/conf/vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8570:80

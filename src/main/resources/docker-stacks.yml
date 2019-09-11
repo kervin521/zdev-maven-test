@@ -320,7 +320,7 @@ services:
       image: 172.21.32.31:5000/dbs-decision-system-web:1.0.0
       restart: always
       volumes:
-      - dbs-decision-system-web:/usr/share/nginx/html/config
+      - vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8080:80
@@ -330,7 +330,7 @@ services:
       image: 172.21.32.31:5000/dbs-cockpit-web:1.0.0
       restart: always
       volumes:
-      - dbs-cockpit-web:/usr/share/nginx/html/config
+      - vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 7070:80
@@ -340,7 +340,7 @@ services:
       image: 172.21.32.31:5000/target-manager-web:1.0.0
       restart: always
       volumes:
-      - target-manager-web:/usr/share/nginx/html/config
+      - vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 9090:80
@@ -350,7 +350,7 @@ services:
       image: 172.21.32.31:5000/authority-web:1.0.0
       restart: always
       volumes:
-      - system-authority-web:/usr/share/nginx/html/config
+      - vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8550:80
@@ -360,7 +360,7 @@ services:
       image: 172.21.32.31:5000/system-manager-web:1.0.0
       restart: always
       volumes:
-      - system-manager-web:/usr/share/nginx/html/config
+      - vue-web:/usr/share/nginx/html/config:ro
       - /etc/localtime:/etc/localtime
       ports:
       - 8570:80
@@ -399,15 +399,5 @@ volumes:
       driver: rexray/rbd:latest
    system-authority-service:
       driver: rexray/rbd:latest
-   system-manager-service:
-      driver: rexray/rbd:latest
-   dbs-decision-system-web:
-      driver: rexray/rbd:latest
-   dbs-cockpit-web:
-      driver: rexray/rbd:latest
-   target-manager-web:
-      driver: rexray/rbd:latest
-   system-authority-web:
-      driver: rexray/rbd:latest
-   system-manager-web:
+   vue-web:
       driver: rexray/rbd:latest

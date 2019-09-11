@@ -1,0 +1,171 @@
+version: '3.7'
+services:
+##############################################################################################
+####################################### data Service###########################################
+##############################################################################################
+   redis-6179:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6179
+      - cluster-announce-bus-port 16179
+      volumes:
+      - /opt/deploy/data/redis/6179/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6179/data:/data:rw
+      ports:
+      - 6179:6179
+      - 16179:16179
+      deploy:
+         replicas: 1
+   redis-6279:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6279
+      - cluster-announce-bus-port 16279
+      volumes:
+      - /opt/deploy/data/redis/6279/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6279/data:/data:rw
+      ports:
+      - 6279:6279
+      - 16279:16279
+      deploy:
+         replicas: 1
+   redis-6379:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6379
+      - cluster-announce-bus-port 16379
+      volumes:
+      - /opt/deploy/data/redis/6379/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6379/data:/data:rw
+      ports:
+      - 6379:6379
+      - 16379:16379
+      deploy:
+         replicas: 1
+   redis-6479:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6479
+      - cluster-announce-bus-port 16479
+      volumes:
+      - /opt/deploy/data/redis/6479/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6479/data:/data:rw
+      ports:
+      - 6479:6479
+      - 16479:16479
+      deploy:
+         replicas: 1
+   redis-6579:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6579
+      - cluster-announce-bus-port 16579
+      volumes:
+      - /opt/deploy/data/redis/6579/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6579/data:/data:rw
+      ports:
+      - 6579:6579
+      - 16579:16579
+      deploy:
+         replicas: 1
+   redis-6679:
+      image: 172.21.32.31:5000/redis:5.0.5-alpine
+      restart: always
+      environment:
+      - appendonly=no
+      - protected-mode=no
+      - cluster-enabled=yes
+      - cluster-config-file=nodes.conf
+      - cluster-node-timeout=5000
+      - cluster-announce-ip=172.21.32.112
+      - cluster-announce-port 6679
+      - cluster-announce-bus-port 16679
+      volumes:
+      - /opt/deploy/data/redis/6679/conf/redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - /opt/deploy/data/redis/6679/data:/data:rw
+      ports:
+      - 6679:6679
+      - 16679:16679
+      deploy:
+         replicas: 1      
+   mysql:
+      image: 172.21.32.31:5000/mysql-canal:5.7.22
+      container_name: mysql
+      restart: always
+      privileged: true
+      environment:
+      - MYSQL_ROOT_PASSWORD=SqlPwd1@
+      volumes:
+      - /opt/deploy/data/mysql/data:/var/lib/mysql
+      ports:
+      - 3306:3306
+      deploy:
+         replicas: 1
+   canal-admin:
+      image: 172.21.32.31:5000/canal/canal-admin:v1.1.4
+      restart: always
+      environment:
+      - server.max-http-header-size=100000
+      - canal.adminUser=admin
+      - canal.adminPasswd=admin
+      volumes:
+      - /opt/deploy/data/canal/admin/conf:/home/admin/canal-admin/conf
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 8089:8089
+      deploy:
+         replicas: 1
+   canal-server:
+      image: 172.21.32.31:5000/canal/canal-server:v1.1.4
+      restart: always
+      environment:
+      - canal.admin.manager=canal-admin:8089
+      - canal.admin.port=11110
+      - canal.admin.user=admin
+      - canal.admin.passwd=4ACFE3202A5FF5CF467898FC58AAB1D615029441
+      - canal.admin.register.cluster=
+      volumes:
+      - /opt/deploy/data/canal/server/conf:/home/admin/canal-server/conf
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 11111:11111
+      depends_on:
+      - mysql
+      deploy:
+         replicas: 1
+  

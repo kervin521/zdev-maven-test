@@ -1,0 +1,14 @@
+port ${PORT}
+protected-mode no
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 172.21.32.132
+cluster-announce-port ${PORT}
+cluster-announce-bus-port 1${PORT}
+appendonly yes
+tcp-keepalive 300
+timeout 30
+repl-ping-slave-period 60
+hz 1
+repl-timeout 60

@@ -1,0 +1,92 @@
+version: '3.7'
+services:
+   zookeeper-1:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 1
+         ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2181:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server131
+   zookeeper-2:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 2
+         ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2182:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server132
+   zookeeper-3:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 3
+         ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2183:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server130
+   kafka:
+      image: wurstmeister/kafka:2.12-2.2.0
+      restart: always
+      environment:
+         BROKER_ID_COMMAND: "date '+%S'"
+         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 172.21.32|awk '{print $$2}'|tr -d 'addr:'"
+         KAFKA_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9092
+         KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9092:9092
+      deploy:
+         replicas: 3
+         placement:
+            preferences:
+            - spread: node.labels.kafka
+   kafka-manager:
+      image: kafkamanager/kafka-manager:2.0.0.2
+      restart: always
+      environment:
+         ZK_HOSTS: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      volumes:
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 19000:9000
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server130

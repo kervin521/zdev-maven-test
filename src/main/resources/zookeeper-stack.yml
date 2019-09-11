@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+   zookeeper-1:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 1
+         ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2181:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server131
+   zookeeper-2:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 2
+         ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2182:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server132
+   zookeeper-3:
+      image: zookeeper:3.5.5
+      restart: always
+      environment:
+         ZOO_MY_ID: 3
+         ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
+      volumes:
+      - /opt/deploy/data/zookeeper/data:/data
+      - /opt/deploy/data/zookeeper/datalog:/datalog
+      - /opt/deploy/data/zookeeper/logs:/logs
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 2183:2181
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server130
