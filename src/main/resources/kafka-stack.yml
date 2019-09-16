@@ -57,24 +57,112 @@ services:
             constraints:
             - node.role==manager
             - node.labels.hostname==dbs-server130
-   kafka:
+   kafka-1:
       image: wurstmeister/kafka:2.12-2.2.0
       restart: always
       environment:
-         BROKER_ID_COMMAND: "date '+%S'"
+         BROKER_ID_COMMAND: "echo 1"
          HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 172.21.32|awk '{print $$2}'|tr -d 'addr:'"
          KAFKA_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9092
          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+         KAFKA_LOG_DIRS: "/kafka/data"
+         KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+         KAFKA_SOCKET_SEND_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
+         KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
+         KAFKA_QUOTA_PRODUCER_DEFAULT: 104857600
+         KAFKA_QUOTA_CONSUMER_DEFAULT: 104857600
       volumes:
+      # - /opt/deploy/data/kafka/conf/server.properties:/opt/kafka/config/server.properties
+      - /opt/deploy/data/kafka/data:/kafka/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9091:9092
+      depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server131
+            preferences:
+            - spread: node.labels.kafka
+   kafka-2:
+      image: wurstmeister/kafka:2.12-2.2.0
+      restart: always
+      environment:
+         BROKER_ID_COMMAND: "echo 2"
+         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 172.21.32|awk '{print $$2}'|tr -d 'addr:'"
+         KAFKA_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9092
+         KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+         KAFKA_LOG_DIRS: "/kafka/data"
+         KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+         KAFKA_SOCKET_SEND_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
+         KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
+         KAFKA_QUOTA_PRODUCER_DEFAULT: 104857600
+         KAFKA_QUOTA_CONSUMER_DEFAULT: 104857600
+      volumes:
+      # - /opt/deploy/data/kafka/conf/server.properties:/opt/kafka/config/server.properties
+      - /opt/deploy/data/kafka/data:/kafka/data
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime
       ports:
       - 9092:9092
+      depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
       deploy:
-         replicas: 3
+         replicas: 1
          placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server132
             preferences:
             - spread: node.labels.kafka
+   kafka-3:
+      image: wurstmeister/kafka:2.12-2.2.0
+      restart: always
+      environment:
+         BROKER_ID_COMMAND: "echo 3"
+         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 172.21.32|awk '{print $$2}'|tr -d 'addr:'"
+         KAFKA_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9092
+         KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+         KAFKA_LOG_DIRS: "/kafka/data"
+         KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+         KAFKA_SOCKET_SEND_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 104857600
+         KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
+         KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
+         KAFKA_QUOTA_PRODUCER_DEFAULT: 104857600
+         KAFKA_QUOTA_CONSUMER_DEFAULT: 104857600
+      volumes:
+      # - /opt/deploy/data/kafka/conf/server.properties:/opt/kafka/config/server.properties
+      - /opt/deploy/data/kafka/data:/kafka/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      ports:
+      - 9093:9092
+      depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      deploy:
+         replicas: 1
+         placement:
+            constraints:
+            - node.role==manager
+            - node.labels.hostname==dbs-server130
+            preferences:
+            - spread: node.labels.kafka
+   
    kafka-manager:
       image: kafkamanager/kafka-manager:2.0.0.2
       restart: always
