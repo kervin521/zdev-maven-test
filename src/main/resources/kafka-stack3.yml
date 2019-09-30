@@ -62,11 +62,8 @@ services:
       restart: always
       environment:
          BROKER_ID_COMMAND: "echo 1"
-         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 10.0|awk '{print $$2}'|tr -d 'addr:'"
-         KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:19092
-         KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:19092
-         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-         KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+         KAFKA_LISTENERS: PLAINTEXT://:9092
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
          KAFKA_LOG_DIRS: "/kafka/data"
          KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
@@ -83,8 +80,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime
       ports:
-       - target: 19092
-         published: 19092
+       - target: 9092
+         published: 9091
          protocol: tcp
          mode: host
       depends_on:
@@ -104,11 +101,8 @@ services:
       restart: always
       environment:
          BROKER_ID_COMMAND: "echo 2"
-         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 10.0|awk '{print $$2}'|tr -d 'addr:'"
-         KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:29092
-         KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:29092
-         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-         KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+         KAFKA_LISTENERS: PLAINTEXT://:9092
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
          KAFKA_LOG_DIRS: "/kafka/data"
          KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
@@ -125,8 +119,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime
       ports:
-       - target: 29092
-         published: 29092
+       - target: 9092
+         published: 9092
          protocol: tcp
          mode: host
       depends_on:
@@ -146,11 +140,8 @@ services:
       restart: always
       environment:
          BROKER_ID_COMMAND: "echo 3"
-         HOSTNAME_COMMAND: "ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v 0.0.0.0|grep -v inet6|grep 10.0|awk '{print $$2}'|tr -d 'addr:'"
-         KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:39092
-         KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:39092
-         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-         KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+         KAFKA_LISTENERS: PLAINTEXT://:9092
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
          KAFKA_LOG_DIRS: "/kafka/data"
          KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
@@ -167,8 +158,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime
       ports:
-       - target: 39092
-         published: 39092
+       - target: 9092
+         published: 9093
          protocol: tcp
          mode: host
       depends_on:
