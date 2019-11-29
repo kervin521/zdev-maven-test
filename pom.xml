@@ -14,12 +14,12 @@
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<metrics.version>3.2.6</metrics.version>
 		<spring.version>4.3.21.RELEASE</spring.version>
-		<spring-boot.version>2.1.4.RELEASE</spring-boot.version>
-		<!-- <spring-boot.version>1.5.18.RELEASE</spring-boot.version> -->
-		<!-- <spring-cloud.version>Finchley.SR2</spring-cloud.version> -->
-		<spring-cloud.version>Edgware.SR5</spring-cloud.version>
-		<spring-cloud-netflix.version>1.4.6.RELEASE</spring-cloud-netflix.version>
-		<!-- <spring-cloud-netflix.version>2.0.2.RELEASE</spring-cloud-netflix.version> -->
+		<spring-boot.version>2.2.1.RELEASE</spring-boot.version>
+		<!-- <spring-boot.version>1.5.22.RELEASE</spring-boot.version> -->
+		<spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+		<!-- <spring-cloud.version>Edgware.SR6</spring-cloud.version> -->
+		<spring-cloud-netflix.version>2.24.2.RELEASE</spring-cloud-netflix.version>
+		<!-- <spring-cloud-netflix.version>1.4.7.RELEASE</spring-cloud-netflix.version> -->
 	</properties>
 	<dependencyManagement>
 		<dependencies>
