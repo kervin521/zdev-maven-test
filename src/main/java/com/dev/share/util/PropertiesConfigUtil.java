@@ -15,7 +15,7 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
  * 版本: v1.0
  * JDK: 1.8.192
  * 
- * @company 空间畅想
+ * @company 
  */
 public class PropertiesConfigUtil {
 	private static ConcurrentHashMap<String, PropertiesConfiguration> map = new ConcurrentHashMap<String, PropertiesConfiguration>();
